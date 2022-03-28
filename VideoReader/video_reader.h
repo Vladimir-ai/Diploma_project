@@ -30,6 +30,7 @@ namespace submodule_video_reader
 
     virtual bool is_finished(void) = 0;
     virtual bool is_started(void) = 0;
+    virtual void reset(void) = 0;
   };
 }
 

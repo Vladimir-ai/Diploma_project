@@ -6,7 +6,7 @@
 
 using namespace submodule_feature_detector;
 
-class fast_feature_detector : abstract_feature_detector
+class fast_feature_detector : public abstract_feature_detector
 {
 private:
   Ptr<FastFeatureDetector> m_detector;
@@ -16,10 +16,10 @@ public:
                         bool nonmaxSuppression=true,
                         FastFeatureDetector::DetectorType type=FastFeatureDetector::TYPE_9_16);
 
-  // abstract_feature_detector interface
-public:
   bool detect_features(Eigen::MatrixXi frame, std::vector<Point2f> &points);
   ~fast_feature_detector();
+
+  void reset();
 };
 
 #endif // FAST_FEATURE_DETECTOR_H

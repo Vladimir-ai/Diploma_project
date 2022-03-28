@@ -1,6 +1,7 @@
 #include "open_cv_video_reader.h"
 #include <opencv2/videoio/videoio_c.h>
 #include <opencv2/core/eigen.hpp>
+#include "Common/common.h"
 
 
 // TODO: add checks to path in the outer part
@@ -75,3 +76,8 @@ bool open_cv_video_reader::is_started()
   return m_cap->isOpened();
 }
 
+void open_cv_video_reader::reset()
+{
+  ASSERT(m_cap);
+  m_cap->set(CAP_PROP_POS_FRAMES, 0);
+}

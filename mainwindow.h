@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
+#include <QPushButton>
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +23,8 @@ private:
     QHBoxLayout *m_main_hbox_layout;
     QVBoxLayout *m_option_box_layout;
 
+    QPushButton *start_btn;
+
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
     QPixmap *m_pixmap;
@@ -31,8 +34,7 @@ private:
     void setup_options_vbox_layout(void);
 
 private slots:
-  void handleButton1();
-  void handleButton2();
+  void handle_start_button();
 
 };
 #endif // MAINWINDOW_H

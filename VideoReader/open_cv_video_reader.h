@@ -4,7 +4,7 @@
 
 using namespace submodule_video_reader;
 
-class open_cv_video_reader : abstract_video_reader
+class open_cv_video_reader : public abstract_video_reader
 {
 protected:
   std::string m_path_to_file;
@@ -27,7 +27,7 @@ public:
 
   bool is_finished();
   bool is_started();
-
+  void reset();
 };
 
 

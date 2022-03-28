@@ -17,6 +17,8 @@ namespace submodule_feature_tracker
     virtual bool track_features(vector<Point2f>& v_src_points, vector<Point2f>& v_dst_points) = 0;
     virtual bool track_features(Mat& frame_src, Mat &frame_dst,
                                 vector<Point2f>& v_src_points, vector<Point2f>& v_dst_points) = 0;
+
+    virtual void reset(void) = 0;
   };
 }
 

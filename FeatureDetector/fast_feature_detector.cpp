@@ -25,3 +25,8 @@ fast_feature_detector::~fast_feature_detector()
 {
   delete m_detector;
 }
+
+void fast_feature_detector::reset()
+{
+  m_detector.reset();
+}

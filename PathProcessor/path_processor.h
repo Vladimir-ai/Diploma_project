@@ -42,6 +42,9 @@ namespace module_path_processor
   class path_processor
   {
   protected:
+    Eigen::MatrixXi m_current_img;
+
+    bool m_is_running = false;
     submodule_type m_running_type;
 
     abstract_feature_tracker *m_feature_tracker;
@@ -49,15 +52,28 @@ namespace module_path_processor
     abstract_video_reader *m_video_reader;
 
   public:
+    path_processor();
+
     path_processor(abstract_feature_tracker *feature_tracker,
                 abstract_feature_detector *feature_detector,
-                abstract_video_reader *video_reader,
-                submodule_type running_type = UNKNOWN);
+                abstract_video_reader *video_reader);
+
+    void set_feature_tracker(abstract_feature_tracker *feature_tracker);
+    void set_feature_detector(abstract_feature_detector *feature_detector);
+    void set_video_reader(abstract_video_reader *video_reader);
+
     ~path_processor();
 
-    void start();
+    Eigen::MatrixXi get_curr_frame(void);
+
+    bool can_start(void);
+    void start(submodule_type running_type);
     void pause();
   };
+
+  abstract_feature_detector *construct_feature_detector(submodule_type detector_type);
+  abstract_feature_tracker *construct_feature_tracker(submodule_type tracker_type);
+  abstract_video_reader *construct_video_reader(submodule_type reader_type, std::string path = "");
 }
 
 #endif // PATH_PROCESSOR_H
