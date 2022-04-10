@@ -46,6 +46,7 @@ bool module_path_processor::PathProcessor::is_started()
   return m_is_running;
 }
 
+
 bool module_path_processor::PathProcessor::is_stopped()
 {
   return m_is_stopped;
