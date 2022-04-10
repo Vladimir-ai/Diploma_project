@@ -15,7 +15,7 @@ namespace submodule_feature_detector
   public:
     virtual ~abstract_feature_detector() = default;
 
-    virtual bool detect_features(Eigen::MatrixXi frame, vector<Point2f>& points) = 0;
+    virtual bool detect_features(Eigen::MatrixXd frame, vector<Point2f>& points) = 0;
 
     virtual void reset() = 0;
   };

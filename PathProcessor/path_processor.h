@@ -4,15 +4,21 @@
 #include <opencv2/core/mat.hpp>
 #include <Eigen/Dense>
 #include <vector>
-#include <FeatureTracker/feature_tracker.h>
-#include <VideoReader/video_reader.h>
-#include <FeatureDetector/feature_detector.h>
+#include "FeatureTracker/feature_tracker.h"
+#include "VideoReader/video_reader.h"
+#include "FeatureDetector/feature_detector.h"
+#include "Logger/logger.h"
+
+#include <mutex>
+#include <condition_variable>
+
 
 using namespace cv;
 using namespace std;
 using namespace submodule_video_reader;
 using namespace submodule_feature_detector;
 using namespace submodule_feature_tracker;
+
 
 /* Use 100 interval */
 enum submodule_type
@@ -39,22 +45,28 @@ enum submodule_type
 namespace module_path_processor
 {
   /* It should only run file or sth with selected features */
-  class path_processor
+  class PathProcessor
   {
   protected:
-    Eigen::MatrixXi m_current_img;
+    std::mutex m_img_mutex;
+    std::mutex m_running_mutex;
+    std::condition_variable m_cond_variable;
+    Mat m_current_img;
 
     bool m_is_running = false;
+    bool m_is_stopped = false;
     submodule_type m_running_type;
 
-    abstract_feature_tracker *m_feature_tracker;
-    abstract_feature_detector *m_feature_detector;
-    abstract_video_reader *m_video_reader;
+    abstract_feature_tracker *m_feature_tracker = nullptr;
+    abstract_feature_detector *m_feature_detector = nullptr;
+    abstract_video_reader *m_video_reader = nullptr;
+
+    abstract_logger *m_logger = nullptr;
 
   public:
-    path_processor();
+    PathProcessor();
 
-    path_processor(abstract_feature_tracker *feature_tracker,
+    PathProcessor(abstract_feature_tracker *feature_tracker,
                 abstract_feature_detector *feature_detector,
                 abstract_video_reader *video_reader);
 
@@ -62,13 +74,31 @@ namespace module_path_processor
     void set_feature_detector(abstract_feature_detector *feature_detector);
     void set_video_reader(abstract_video_reader *video_reader);
 
-    ~path_processor();
+    void get_feature_tracker(abstract_feature_tracker *feature_tracker);
+    void get_feature_detector(abstract_feature_detector *feature_detector);
+    void get_video_reader(abstract_video_reader *video_reader);
 
-    Eigen::MatrixXi get_curr_frame(void);
 
-    bool can_start(void);
+    void set_logger(abstract_logger *logger);
+
+    ~PathProcessor();
+
+    Mat get_curr_frame(void);
+
+    bool is_started(void);
+    bool is_stopped(void);
     void start(submodule_type running_type);
-    void pause();
+    void step(void);
+    void pause(void);
+    void continue_running(void);
+    void stop(void);
+
+  private:
+    void thread_running(uint8_t job_count);
+    void process_frame(uint8_t job_count);
+
+//    do start and pause,
+//    do thread running.
   };
 
   abstract_feature_detector *construct_feature_detector(submodule_type detector_type);

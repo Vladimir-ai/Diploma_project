@@ -18,14 +18,14 @@ include(PathProcessor/PathProcessor.pri)
 # In order to do so, uncomment the following line.
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+CONFIG += console
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     mainwindow.h
-
-FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -37,5 +37,5 @@ unix
     INCLUDEPATH += /usr/include/opencv4 \
                     /usr/include/eigen3
 
-    LIBS += -lopencv_videoio -lopencv_features2d -lopencv_core
+    LIBS += -lopencv_videoio -lopencv_features2d -lopencv_core -lopencv_imgproc
 }

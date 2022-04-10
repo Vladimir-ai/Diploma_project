@@ -9,11 +9,17 @@ open_cv_video_reader::open_cv_video_reader(std::string path_to_video)
 {
   m_cap = new VideoCapture(path_to_video);
   m_frame_count = m_cap->get(CV_CAP_PROP_FRAME_COUNT);
+  m_frame_num = 0;
 }
 
 
 open_cv_video_reader::~open_cv_video_reader()
 {
+  if (m_cap->isOpened())
+  {
+    m_cap->release();
+  }
+
   delete m_cap;
 }
 
@@ -24,50 +30,49 @@ uint64_t open_cv_video_reader::get_current_frame_num()
 }
 
 
-Eigen::MatrixXi open_cv_video_reader::get_current_frame()
+Mat open_cv_video_reader::get_current_frame()
 {
   return m_current_frame;
 }
 
 
-Eigen::MatrixXi open_cv_video_reader::get_previous_frame()
+Mat open_cv_video_reader::get_previous_frame()
 {
   return m_previous_frame;
 }
 
 
-Eigen::MatrixXi open_cv_video_reader::read_frame_by_num(uint64_t num)
+Mat open_cv_video_reader::read_frame_by_num(uint64_t num)
 {
-  Mat tmp_img;
-  Eigen::MatrixXi result;
+  Mat result;
 
   m_frame_num = m_cap->get(CV_CAP_PROP_POS_FRAMES);
   m_cap->set(CV_CAP_PROP_POS_FRAMES, num);
 
-  *m_cap >> tmp_img;
-
-  cv2eigen(tmp_img, result);
+  *m_cap >> result;
 
   m_cap->set(CV_CAP_PROP_POS_FRAMES, m_frame_num);
   return result;
 }
 
 
-Eigen::MatrixXi open_cv_video_reader::read_next_frame()
+Mat open_cv_video_reader::read_next_frame()
 {
   Mat tmp_img;
   m_previous_frame = m_current_frame;
+  if (!is_finished())
+  {
+    *m_cap >> tmp_img;
+    m_frame_num++;
+  }
 
-  *m_cap >> tmp_img;
-  cv2eigen(tmp_img, m_current_frame);
-
-  return m_current_frame;
+  return tmp_img;
 }
 
 
 bool open_cv_video_reader::is_finished()
 {
-  return m_frame_count < m_cap->get(CV_CAP_PROP_POS_FRAMES);
+  return (m_frame_count - 1) < m_frame_num;
 }
 
 
@@ -76,8 +81,16 @@ bool open_cv_video_reader::is_started()
   return m_cap->isOpened();
 }
 
+
 void open_cv_video_reader::reset()
 {
   ASSERT(m_cap);
   m_cap->set(CAP_PROP_POS_FRAMES, 0);
+}
+
+
+void open_cv_video_reader::stop()
+{
+  ASSERT(m_cap);
+  m_cap->release();
 }

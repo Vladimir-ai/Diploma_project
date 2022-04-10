@@ -2,8 +2,10 @@
 #include "FeatureDetector/fast_feature_detector.h"
 #include "VideoReader/open_cv_video_reader.h"
 
+#include <thread>
 
-module_path_processor::path_processor::path_processor(abstract_feature_tracker *feature_tracker,
+
+module_path_processor::PathProcessor::PathProcessor(abstract_feature_tracker *feature_tracker,
                                                       abstract_feature_detector *feature_detector,
                                                       abstract_video_reader *video_reader)
 {
@@ -13,30 +15,160 @@ module_path_processor::path_processor::path_processor(abstract_feature_tracker *
 }
 
 
-module_path_processor::path_processor::~path_processor()
+module_path_processor::PathProcessor::~PathProcessor()
 {
-  delete m_feature_tracker;
+  if (m_feature_tracker != nullptr)
+  {
+    delete m_feature_tracker;
+  }
   delete m_feature_detector;
   delete m_video_reader;
 }
 
 
-Eigen::MatrixXi module_path_processor::path_processor::get_curr_frame()
+Mat module_path_processor::PathProcessor::get_curr_frame()
 {
-  return m_current_img;
+  Mat img_copy;
+
+  m_img_mutex.lock();
+  if (m_current_img.size != 0)
+  {
+    img_copy = m_current_img.clone();
+  }
+  m_img_mutex.unlock();
+
+  return img_copy;
 }
 
 
-void module_path_processor::path_processor::start(submodule_type running_type)
+bool module_path_processor::PathProcessor::is_started()
+{
+  return m_is_running;
+}
+
+bool module_path_processor::PathProcessor::is_stopped()
+{
+  return m_is_stopped;
+}
+
+
+void module_path_processor::PathProcessor::start(submodule_type running_type)
 {
   m_running_type = running_type;
   m_is_running = true;
+
+  std::thread thread(&PathProcessor::thread_running, this, 1);
+  thread.detach();
 }
 
 
-void module_path_processor::path_processor::pause()
+void module_path_processor::PathProcessor::step()
 {
+  m_running_mutex.lock();
+  m_is_running = true;
+  m_running_mutex.unlock();
+
+  m_cond_variable.notify_one();
+}
+
+
+void module_path_processor::PathProcessor::pause()
+{
+  m_running_mutex.lock();
   m_is_running = false;
+  m_running_mutex.unlock();
+}
+
+
+void module_path_processor::PathProcessor::continue_running()
+{
+  m_running_mutex.lock();
+  m_is_running = true;
+  m_running_mutex.unlock();
+
+  m_cond_variable.notify_one();
+}
+
+void module_path_processor::PathProcessor::stop()
+{
+  m_running_mutex.lock();
+  m_video_reader->stop();
+  m_running_mutex.unlock();
+}
+
+
+void module_path_processor::PathProcessor::thread_running(uint8_t job_count)
+{
+  (void)job_count;
+
+  m_running_mutex.lock();
+  m_is_running = true;
+  m_is_stopped = false;
+  m_running_mutex.unlock();
+
+  mutex running_lock;
+
+  std::unique_lock lock(running_lock);
+
+  switch (m_running_type)
+  {
+    case submodule_type::CONTINUOUSLY:
+      while (!m_is_stopped && !m_video_reader->is_finished())
+      {
+        if (!m_is_running)
+        {
+          m_cond_variable.wait(lock);
+        }
+
+        process_frame(job_count);
+      }
+      break;
+
+    case submodule_type::STEP_BY_STEP:
+      while (!m_is_stopped && !m_video_reader->is_finished())
+      {
+        if (!m_is_running)
+        {
+          m_cond_variable.wait(lock);
+        }
+
+        process_frame(job_count);
+
+        m_running_mutex.lock();
+        m_is_running = false;
+        m_running_mutex.unlock();
+      }
+      break;
+
+    default:
+      break;
+    }
+
+  lock.release();
+
+  m_running_mutex.lock();
+  m_is_running = false;
+  m_is_stopped = true;
+  m_running_mutex.unlock();
+}
+
+
+void module_path_processor::PathProcessor::process_frame(uint8_t job_count)
+{
+  (void) job_count;
+
+  if (!m_video_reader->is_finished())
+  {
+    auto frame = m_video_reader->read_next_frame();
+    if (m_logger)
+    {
+      m_logger->log_info("Reading video frame: " + std::to_string(m_video_reader->get_current_frame_num()));
+    }
+
+    m_img_mutex.lock();
+    cvtColor(frame, m_current_img, cv::COLOR_BGR2RGB);
+    m_img_mutex.unlock();
+  }
 }
 
 
@@ -55,7 +187,6 @@ abstract_feature_detector *module_path_processor::construct_feature_detector(sub
 
   return ret_value;
 }
-
 
 
 abstract_feature_tracker *module_path_processor::construct_feature_tracker(submodule_type tracker_type)

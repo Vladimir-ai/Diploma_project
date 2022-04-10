@@ -9,7 +9,7 @@ fast_feature_detector::fast_feature_detector(int threshold,
 }
 
 
-bool fast_feature_detector::detect_features(Eigen::MatrixXi frame, std::vector<Point2f> &points)
+bool fast_feature_detector::detect_features(Eigen::MatrixXd frame, std::vector<Point2f> &points)
 {
   vector<KeyPoint> kp;
   Mat img;
@@ -23,7 +23,6 @@ bool fast_feature_detector::detect_features(Eigen::MatrixXi frame, std::vector<P
 
 fast_feature_detector::~fast_feature_detector()
 {
-  delete m_detector;
 }
 
 void fast_feature_detector::reset()

@@ -19,15 +19,17 @@ public:
 public:
   uint64_t get_current_frame_num();
 
-  Eigen::MatrixXi get_current_frame();
-  Eigen::MatrixXi get_previous_frame();
+  Mat get_current_frame();
+  Mat get_previous_frame();
 
-  Eigen::MatrixXi read_frame_by_num(uint64_t num);
-  Eigen::MatrixXi read_next_frame();
+  Mat read_frame_by_num(uint64_t num);
+  Mat read_next_frame();
 
   bool is_finished();
   bool is_started();
+
   void reset();
+  void stop();
 };
 
 

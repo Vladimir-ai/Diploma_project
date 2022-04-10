@@ -16,7 +16,7 @@ public:
                         bool nonmaxSuppression=true,
                         FastFeatureDetector::DetectorType type=FastFeatureDetector::TYPE_9_16);
 
-  bool detect_features(Eigen::MatrixXi frame, std::vector<Point2f> &points);
+  bool detect_features(Eigen::MatrixXd frame, std::vector<Point2f> &points);
   ~fast_feature_detector();
 
   void reset();
