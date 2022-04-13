@@ -8,6 +8,7 @@
 #include "PathProcessor/path_processor.h"
 #include "FeatureDetector/fast_feature_detector.h"
 #include "VideoReader/open_cv_video_reader.h"
+#include "Logger/boostlogger.h"
 
 //make factories
 //factory video driver
@@ -23,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
   setup_layout();
   setup_options_vbox_layout();
   setup_timer();
+
+  m_logger = new BoostLogger(QDir::currentPath().toStdString() + "/text_log.log");
 }
 
 
@@ -153,6 +156,8 @@ void MainWindow::handle_start_button()
   abstract_video_reader *video_reader = new open_cv_video_reader(m_path_to_video_file.toStdString());
 
   m_path_processor = new module_path_processor::PathProcessor(nullptr, feature_detector, video_reader);
+
+  m_path_processor->set_logger(m_logger);
 
   if (m_running_type_selector->currentIndex() == 0)
   {

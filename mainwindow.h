@@ -9,7 +9,7 @@
 #include <QComboBox>
 
 #include "PathProcessor/path_processor.h"
-
+#include "Logger/logger.h"
 
 class MainWindow : public QMainWindow
 {
@@ -21,6 +21,8 @@ public:
 
 private:
     const int mc_timer_timeout = 1000 / 24;
+    abstract_logger *m_logger = nullptr;
+
     QTimer *m_timer = nullptr;
     QWidget *m_central_widget = nullptr;
     QWidget *m_options_widget = nullptr;

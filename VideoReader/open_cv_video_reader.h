@@ -19,6 +19,8 @@ public:
 public:
   uint64_t get_current_frame_num();
 
+  void set_logger(abstract_logger *logger);
+
   Mat get_current_frame();
   Mat get_previous_frame();
 

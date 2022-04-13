@@ -14,6 +14,11 @@ module_path_processor::PathProcessor::PathProcessor(abstract_feature_tracker *fe
   m_video_reader = video_reader;
 }
 
+void module_path_processor::PathProcessor::set_logger(abstract_logger *logger)
+{
+  m_logger = logger;
+}
+
 
 module_path_processor::PathProcessor::~PathProcessor()
 {
@@ -161,10 +166,9 @@ void module_path_processor::PathProcessor::process_frame(uint8_t job_count)
   if (!m_video_reader->is_finished())
   {
     auto frame = m_video_reader->read_next_frame();
-    if (m_logger)
-    {
-      m_logger->log_info("Reading video frame: " + std::to_string(m_video_reader->get_current_frame_num()));
-    }
+
+    LOG_INFO(m_logger, "Reading video frame: " + std::to_string(m_video_reader->get_current_frame_num()));
+
 
     m_img_mutex.lock();
     cvtColor(frame, m_current_img, cv::COLOR_BGR2RGB);

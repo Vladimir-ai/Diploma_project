@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <Eigen/Dense>
+#include <Logger/logger.h>
 
 using namespace cv;
 
@@ -17,8 +18,12 @@ namespace submodule_video_reader
     Mat m_previous_frame;
     Mat m_current_frame;
 
+    abstract_logger *m_logger;
+
   public:
     virtual ~abstract_video_reader() = default;
+
+    virtual void set_logger(abstract_logger *logger) = 0;
 
     virtual uint64_t get_current_frame_num(void) = 0;
 

@@ -30,6 +30,12 @@ uint64_t open_cv_video_reader::get_current_frame_num()
 }
 
 
+void open_cv_video_reader::set_logger(abstract_logger *logger)
+{
+  m_logger = logger;
+}
+
+
 Mat open_cv_video_reader::get_current_frame()
 {
   return m_current_frame;

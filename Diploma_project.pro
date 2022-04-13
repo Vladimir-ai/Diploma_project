@@ -20,9 +20,6 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 CONFIG += console
 
-SUBDIRS += \
-  Thirdparty/CuteLogger/CuteLogger.pro
-
 SOURCES += \
     main.cpp \
     mainwindow.cpp
