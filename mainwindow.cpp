@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QKeyEvent>
 #include <QFileDialog>
+#include "FeatureTracker/opencvfeaturetracker.h"
 #include "PathProcessor/path_processor.h"
 #include "FeatureDetector/fast_feature_detector.h"
 #include "VideoReader/open_cv_video_reader.h"
@@ -61,7 +62,7 @@ void MainWindow::setup_options_vbox_layout()
   QVBoxLayout *feature_tracker_layout = new QVBoxLayout();
   QLabel *feature_tracker_label = new QLabel("Feature Tracker type:");
   QComboBox *feature_tracker_box = new QComboBox();
-  feature_tracker_box->addItem("Not Implemented", NOT_IMPLEMENTED);
+  feature_tracker_box->addItem("Lukas-Kanade", OPENCV_FEATURE_TRACKER);
   feature_tracker_layout->addWidget(feature_tracker_label);
   feature_tracker_layout->addWidget(feature_tracker_box);
   feature_tracker_layout->setSpacing(5);
@@ -154,8 +155,9 @@ void MainWindow::handle_start_button()
 
   abstract_feature_detector *feature_detector = new fast_feature_detector();
   abstract_video_reader *video_reader = new open_cv_video_reader(m_path_to_video_file.toStdString());
+  abstract_feature_tracker *feature_tracker = new OpencvFeatureTracker();
 
-  m_path_processor = new module_path_processor::PathProcessor(nullptr, feature_detector, video_reader);
+  m_path_processor = new module_path_processor::PathProcessor(feature_tracker, feature_detector, video_reader);
 
   m_path_processor->set_logger(m_logger);
 
@@ -250,7 +252,7 @@ void MainWindow::timer_timeout()
   if (m_path_processor && !m_path_processor->is_stopped())
   {
     Mat img = m_path_processor->get_curr_frame();
-    QImage img_copy = QImage(img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
+    QImage img_copy = QImage(img.data, img.cols, img.rows, img.step, QImage::Format_BGR888);
     img_copy.bits();
     QPixmap pixmap = QPixmap::fromImage(img_copy);
 

@@ -1,5 +1,4 @@
 #include "fast_feature_detector.h"
-#include <opencv2/core/eigen.hpp>
 
 fast_feature_detector::fast_feature_detector(int threshold,
                                              bool nonmaxSuppression,
@@ -9,14 +8,13 @@ fast_feature_detector::fast_feature_detector(int threshold,
 }
 
 
-bool fast_feature_detector::detect_features(Eigen::MatrixXd frame, std::vector<Point2f> &points)
+bool fast_feature_detector::detect_features(cv::Mat frame, std::vector<Point2f> &points)
 {
   vector<KeyPoint> kp;
-  Mat img;
-  eigen2cv(frame, img);
 
-  m_detector->detect(img, kp);
-  return false;
+  m_detector->detect(frame, kp);
+  KeyPoint::convert(kp, points);
+  return true;
 }
 
 

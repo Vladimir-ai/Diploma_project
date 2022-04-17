@@ -4,6 +4,7 @@
 #include <opencv2/core/mat.hpp>
 #include <Eigen/Dense>
 #include <vector>
+#include "Common/common.h"
 #include "FeatureTracker/feature_tracker.h"
 #include "VideoReader/video_reader.h"
 #include "FeatureDetector/feature_detector.h"
@@ -20,28 +21,6 @@ using namespace submodule_feature_detector;
 using namespace submodule_feature_tracker;
 
 
-/* Use 100 interval */
-enum submodule_type
-{
-  UNKNOWN = 0,
-  /* Video reader start */
-  OPENCV_READER = 100,
-  /* Video reader end */
-
-  /* Feature detector start */
-  FAST_DETECTOR = 200,
-  /* Feature detector end */
-
-  /* Feature tracker start */
-  NOT_IMPLEMENTED = 300,
-  /* Feature tracker end */
-
-  /* Running mode */
-  STEP_BY_STEP = 400,
-  CONTINUOUSLY = 401
-};
-
-
 namespace module_path_processor
 {
   /* It should only run file or sth with selected features */
@@ -51,7 +30,10 @@ namespace module_path_processor
     std::mutex m_img_mutex;
     std::mutex m_running_mutex;
     std::condition_variable m_cond_variable;
-    Mat m_current_img;
+
+    Mat m_img[2];
+    vector<Point2f> m_keypoints[2];
+    uint8_t m_current_switch = 0;
 
     bool m_is_running = false;
     bool m_is_stopped = false;
@@ -78,8 +60,9 @@ namespace module_path_processor
     void get_feature_detector(abstract_feature_detector *feature_detector);
     void get_video_reader(abstract_video_reader *video_reader);
 
-
     void set_logger(abstract_logger *logger);
+
+    void draw_trace(Mat &frame);
 
     ~PathProcessor();
 

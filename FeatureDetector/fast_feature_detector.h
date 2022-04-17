@@ -12,11 +12,11 @@ private:
   Ptr<FastFeatureDetector> m_detector;
 
 public:
-  fast_feature_detector(int threshold=10,
-                        bool nonmaxSuppression=true,
+  fast_feature_detector(int threshold=100,
+                        bool nonmaxSuppression=false,
                         FastFeatureDetector::DetectorType type=FastFeatureDetector::TYPE_9_16);
 
-  bool detect_features(Eigen::MatrixXd frame, std::vector<Point2f> &points);
+  bool detect_features(cv::Mat frame, std::vector<Point2f> &points);
   ~fast_feature_detector();
 
   void reset();

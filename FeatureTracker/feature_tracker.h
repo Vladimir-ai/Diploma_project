@@ -1,6 +1,7 @@
 #ifndef FEATURE_TRACKER_H
 #define FEATURE_TRACKER_H
 
+#include "Common/common.h"
 #include <opencv2/core/mat.hpp>
 #include <vector>
 
@@ -19,6 +20,8 @@ namespace submodule_feature_tracker
                                 vector<Point2f>& v_src_points, vector<Point2f>& v_dst_points) = 0;
 
     virtual void reset(void) = 0;
+
+    virtual submodule_type get_type(void) = 0;
   };
 }
 

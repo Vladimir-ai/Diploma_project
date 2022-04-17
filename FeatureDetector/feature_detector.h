@@ -3,7 +3,6 @@
 
 #include <opencv2/core/mat.hpp>
 #include <vector>
-#include <Eigen/Dense>
 
 using namespace cv;
 using namespace std;
@@ -15,7 +14,7 @@ namespace submodule_feature_detector
   public:
     virtual ~abstract_feature_detector() = default;
 
-    virtual bool detect_features(Eigen::MatrixXd frame, vector<Point2f>& points) = 0;
+    virtual bool detect_features(cv::Mat frame, vector<Point2f>& points) = 0;
 
     virtual void reset() = 0;
   };
