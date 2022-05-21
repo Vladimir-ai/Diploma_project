@@ -11,20 +11,23 @@ enum submodule_type
 {
   UNKNOWN = 0,
   /* Video reader start */
-  OPENCV_READER = 100,
+  DYNAMIC_LOADED_READER = 100,
+  OPENCV_READER = 101,
   /* Video reader end */
 
   /* Feature detector start */
-  FAST_DETECTOR = 200,
+  DYNAMIC_LOADED_DETECTOR = 200,
+  FAST_DETECTOR = 201,
   /* Feature detector end */
 
   /* Feature tracker start */
-  OPENCV_FEATURE_TRACKER = 300,
+  DYNAMIC_LOADED_TRACKER = 300,
+  OPENCV_FEATURE_TRACKER = 301,
   /* Feature tracker end */
 
   /* Running mode */
   STEP_BY_STEP = 400,
-  CONTINUOUSLY = 401
+  CONTINUOUSLY = 401,
 };
 
 #endif // COMMON_H
