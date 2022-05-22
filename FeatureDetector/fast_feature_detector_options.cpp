@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-fast_feature_detector_options::fast_feature_detector_options()
+fast_feature_detector_options::fast_feature_detector_options(func_error_handler err_handler): AbstractInfoQtFrame(err_handler)
 {
   m_layout = new QVBoxLayout(this);
   m_threshold = new QLineEdit();
@@ -67,7 +67,18 @@ submodule_video_reader::abstract_video_reader *fast_feature_detector_options::ge
 }
 
 
+submodule_pose_estimator::abstract_pose_estimator *fast_feature_detector_options::get_pose_estimator()
+{
+  return nullptr;
+}
+
+
 submodule_type fast_feature_detector_options::get_type()
 {
   return FAST_DETECTOR;
+}
+
+string fast_feature_detector_options::get_name()
+{
+  return "FAST";
 }

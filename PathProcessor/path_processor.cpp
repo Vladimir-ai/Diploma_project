@@ -14,6 +14,7 @@ module_path_processor::PathProcessor::PathProcessor(abstract_feature_tracker *fe
   m_video_reader = video_reader;
 }
 
+
 void module_path_processor::PathProcessor::set_logger(abstract_logger *logger)
 {
   m_logger = logger;
@@ -21,20 +22,20 @@ void module_path_processor::PathProcessor::set_logger(abstract_logger *logger)
 
 
 /* frame is equal to current, need it to not block mutex */
-void module_path_processor::PathProcessor::draw_trace(Mat &frame)
+void module_path_processor::PathProcessor::draw_trace(Mat &frame, const vector<Point2f> &src_keypoints, const vector<Point2f> &dst_keypoints)
 {
-  const auto curr_size = m_keypoints[m_current_switch].size();
+  const auto curr_size = dst_keypoints.size();
   const Scalar red(0, 0, 255);
   const Scalar green(0, 255, 0);
 
-  for_each(m_keypoints[m_current_switch].begin(), m_keypoints[m_current_switch].end(),
+  for_each(dst_keypoints.begin(), dst_keypoints.end(),
            [frame](const Point2f& keypoint){ circle(frame, keypoint, 2, Scalar(0, 0, 255), -1); });
 
-  if (curr_size == m_keypoints[!m_current_switch].size())
+  if (curr_size == src_keypoints.size())
   {
     for(size_t idx = 0; idx < curr_size; idx++)
     {
-      line(frame, m_keypoints[m_current_switch][idx], m_keypoints[!m_current_switch][idx], green, 2);
+      line(frame, dst_keypoints[idx], src_keypoints[idx], green, 2);
     }
   }
 }
@@ -118,7 +119,10 @@ void module_path_processor::PathProcessor::continue_running()
 void module_path_processor::PathProcessor::stop()
 {
   m_running_mutex.lock();
-  m_video_reader->stop();
+  if (m_video_reader)
+  {
+    m_video_reader->stop();
+  }
   m_running_mutex.unlock();
 }
 
@@ -139,7 +143,7 @@ void module_path_processor::PathProcessor::thread_running(uint8_t job_count)
   switch (m_running_type)
   {
     case submodule_type::CONTINUOUSLY:
-      while (!m_is_stopped && !m_video_reader->is_finished())
+      while (!m_is_stopped && m_video_reader && !m_video_reader->is_finished())
       {
         if (!m_is_running)
         {
@@ -186,22 +190,23 @@ void module_path_processor::PathProcessor::process_frame(uint8_t job_count)
   if (!m_video_reader->is_finished())
   {
     auto frame = m_video_reader->read_next_frame();
-    vector<Point2f> prev_keypoints_copy = m_keypoints[!m_current_switch];
-    vector<Point2f> curr_keypoints_copy;
+    vector<Point2f> src_keypoints_copy;
+    vector<Point2f> dst_keypoints_copy;
 
     LOG_INFO(m_logger, "Reading video frame: " + std::to_string(m_video_reader->get_current_frame_num()));
 
     m_feature_detector->detect_features(frame, m_keypoints[m_current_switch]);
     LOG_INFO(m_logger, "Detecting features: " + std::to_string(m_keypoints[m_current_switch].size()));
 
-    curr_keypoints_copy = m_keypoints[m_current_switch];
+    src_keypoints_copy = m_keypoints[!m_current_switch];
+    dst_keypoints_copy = m_keypoints[m_current_switch];
 
     /* If haven't found any keypoints, raise error */
     if (m_keypoints[!m_current_switch].size() > 0)
     {
       if (m_feature_tracker->get_type() == OPENCV_FEATURE_TRACKER)
       {
-        m_feature_tracker->track_features(m_img[!m_current_switch], frame, m_keypoints[!m_current_switch], m_keypoints[m_current_switch]);
+        m_feature_tracker->track_features(m_img[!m_current_switch], frame, src_keypoints_copy, dst_keypoints_copy);
         LOG_INFO(m_logger, "Detecting features: " + std::to_string(m_keypoints[m_current_switch].size()));
       }
     }
@@ -211,10 +216,7 @@ void module_path_processor::PathProcessor::process_frame(uint8_t job_count)
     }
 
     /* Call it here to block mutex for the least possible time */
-    draw_trace(frame);
-
-    m_keypoints[!m_current_switch] = prev_keypoints_copy;
-    m_keypoints[m_current_switch] = curr_keypoints_copy;
+    draw_trace(frame, src_keypoints_copy, dst_keypoints_copy);
 
     m_img_mutex.lock();
     m_img[m_current_switch] = frame;

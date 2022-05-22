@@ -5,11 +5,16 @@
 #include <QLabel>
 #include <QKeyEvent>
 #include <QFileDialog>
+#include <QMessageBox>
+#include "FeatureDetector/fast_feature_detector_options.h"
 #include "FeatureTracker/opencvfeaturetracker.h"
+#include "FeatureTracker/opencvfeaturetrackerwidget.h"
 #include "PathProcessor/path_processor.h"
 #include "FeatureDetector/fast_feature_detector.h"
+#include "PoseEstimator/opencv_pose_estimator_widget.h"
 #include "VideoReader/open_cv_video_reader.h"
 #include "Logger/boostlogger.h"
+#include "VideoReader/opencv_video_reader_widget.h"
 
 //make factories
 //factory video driver
@@ -35,6 +40,76 @@ MainWindow::~MainWindow()
   delete m_central_widget;
 }
 
+void MainWindow::error_handler(string error)
+{
+  QMessageBox messageBox;
+  messageBox.critical(0, "Error", QString::fromStdString(error));
+  messageBox.show();
+}
+
+
+inline void MainWindow::init_video_reader_layout()
+{
+  m_video_reader_layout = new QVBoxLayout();
+  QLabel *video_reader_label = new QLabel("Video Reader type:");
+  m_video_reader_box = new QComboBox();
+
+  m_reader_info = new OpenCvVideoReaderInfoWidget(error_handler);
+  m_video_reader_box->addItem(QString::fromStdString(m_reader_info->get_name()), QVariant::fromValue(m_reader_info));
+  m_video_reader_layout->addWidget(video_reader_label);
+  m_video_reader_layout->addWidget(m_video_reader_box);
+  m_video_reader_layout->addWidget(m_reader_info);
+  m_video_reader_layout->setSpacing(5);
+}
+
+
+inline void MainWindow::init_feature_detector_layout()
+{
+  m_feature_detector_layout = new QVBoxLayout();
+  QLabel *feature_detector_label = new QLabel("Feature Detector type:");
+  m_feature_detector_box = new QComboBox();
+
+  m_detector_info = new fast_feature_detector_options(error_handler);
+
+  m_feature_detector_box->addItem(QString::fromStdString(m_detector_info->get_name()), QVariant::fromValue(m_detector_info));
+  m_feature_detector_layout->addWidget(feature_detector_label);
+  m_feature_detector_layout->addWidget(m_feature_detector_box);
+  m_feature_detector_layout->addWidget(m_detector_info);
+  m_feature_detector_layout->setSpacing(5);
+}
+
+
+void MainWindow::init_feature_tracker_layout()
+{
+  m_feature_tracker_layout = new QVBoxLayout();
+  QLabel *feature_tracker_label = new QLabel("Feature Tracker type:");
+  m_feature_tracker_box = new QComboBox();
+
+  m_tracker_info = new OpencvFeatureTrackerWidget(error_handler);
+
+  m_feature_tracker_box->addItem(QString::fromStdString(m_tracker_info->get_name()), QVariant::fromValue(m_tracker_info));
+  m_feature_tracker_layout->addWidget(feature_tracker_label);
+  m_feature_tracker_layout->addWidget(m_feature_tracker_box);
+  m_feature_tracker_layout->setSpacing(5);
+}
+
+
+void MainWindow::init_pose_estimator_layout()
+{
+  m_pose_estimator_layout = new QVBoxLayout();
+  QLabel *pose_estimator_label = new QLabel("Pose estimator type:");
+  m_pose_estimator_box = new QComboBox();
+
+  m_pose_estimator_info = new OpencvPoseEstimatorWidget(error_handler);
+
+  m_pose_estimator_box->addItem(QString::fromStdString(m_pose_estimator_info->get_name()), QVariant::fromValue(m_pose_estimator_info));
+
+  m_pose_estimator_layout->addWidget(pose_estimator_label);
+  m_pose_estimator_layout->addWidget(m_pose_estimator_box);
+  m_pose_estimator_layout->addWidget(m_pose_estimator_info);
+  m_pose_estimator_layout->setSpacing(5);
+}
+
 
 void MainWindow::setup_layout()
 {
@@ -57,35 +132,10 @@ void MainWindow::setup_options_vbox_layout()
   m_options_widget = new QWidget();
   m_option_box_layout = new QVBoxLayout(m_options_widget);
 
-  m_select_file_btn = new QPushButton("Select file");
-
-  QVBoxLayout *feature_tracker_layout = new QVBoxLayout();
-  QLabel *feature_tracker_label = new QLabel("Feature Tracker type:");
-  QComboBox *feature_tracker_box = new QComboBox();
-  feature_tracker_box->addItem("Lukas-Kanade", OPENCV_FEATURE_TRACKER);
-  feature_tracker_layout->addWidget(feature_tracker_label);
-  feature_tracker_layout->addWidget(feature_tracker_box);
-  feature_tracker_layout->setSpacing(5);
-
-
-  QVBoxLayout *feature_detector_layout = new QVBoxLayout();
-  QLabel *feature_detector_label = new QLabel("Feature Detector type:");
-  QComboBox *feature_detector_box = new QComboBox();
-  feature_detector_box->addItem("FAST", FAST_DETECTOR);
-  feature_detector_layout->addWidget(feature_detector_label);
-  feature_detector_layout->addWidget(feature_detector_box);
-  feature_detector_layout->setSpacing(5);
-
-  QVBoxLayout *video_reader_layout = new QVBoxLayout();
-  QLabel *video_reader_label = new QLabel("Video Reader type:");
-  QComboBox *video_reader_box = new QComboBox();
-  video_reader_box->addItem("Video file", OPENCV_READER);
-  video_reader_layout->addWidget(video_reader_label);
-  video_reader_layout->addWidget(video_reader_box);
-  video_reader_layout->addWidget(m_select_file_btn);
-  video_reader_layout->setSpacing(5);
-
-//  connect(video_reader_box, )
+  init_video_reader_layout();
+  init_feature_detector_layout();
+  init_feature_tracker_layout();
+  init_pose_estimator_layout();
 
   m_start_btn = new QPushButton("Start");
   m_stop_btn = new QPushButton("Stop");
@@ -108,11 +158,11 @@ void MainWindow::setup_options_vbox_layout()
   m_stop_pause_layout->addWidget(m_continue_btn);
 
 
-  m_option_box_layout->addLayout(feature_tracker_layout);
+  m_option_box_layout->addLayout(m_feature_detector_layout);
+  m_option_box_layout->addLayout(m_feature_tracker_layout);
+  m_option_box_layout->addLayout(m_pose_estimator_layout);
 
-  m_option_box_layout->addLayout(feature_detector_layout);
-
-  m_option_box_layout->addLayout(video_reader_layout);
+  m_option_box_layout->addLayout(m_video_reader_layout);
   m_option_box_layout->addStretch(1);
   m_option_box_layout->addLayout(m_running_type_layout);
 
@@ -123,9 +173,8 @@ void MainWindow::setup_options_vbox_layout()
   connect(m_continue_btn, &QPushButton::clicked, this, &MainWindow::handle_continue_button);
   connect(m_pause_btn, &QPushButton::clicked, this, &MainWindow::handle_pause_button);
 
+  connect(m_feature_detector_box, &QComboBox::currentIndexChanged, this, &MainWindow::handle_detector_type_change);
   connect(m_running_type_selector, &QComboBox::currentIndexChanged, this, &MainWindow::handle_running_mode_change);
-
-  connect(m_select_file_btn, &QPushButton::clicked, this, &MainWindow::call_video_selection);
 
   m_options_widget->setLayout(m_option_box_layout);
 
@@ -145,7 +194,6 @@ void MainWindow::setup_timer()
 
 void MainWindow::handle_start_button()
 {
-
   m_running_type_selector->setEnabled(false);
 
   if (m_path_processor)
@@ -153,9 +201,12 @@ void MainWindow::handle_start_button()
     delete m_path_processor;
   }
 
-  abstract_feature_detector *feature_detector = new fast_feature_detector();
-  abstract_video_reader *video_reader = new open_cv_video_reader(m_path_to_video_file.toStdString());
-  abstract_feature_tracker *feature_tracker = new OpencvFeatureTracker();
+  abstract_feature_detector *feature_detector = m_detector_info->get_feature_detector();
+  abstract_video_reader *video_reader = m_reader_info->get_video_reader();
+  abstract_feature_tracker *feature_tracker = m_tracker_info->get_feature_tracker();
+  abstract_pose_estimator *pose_estimator = m_pose_estimator_info->get_pose_estimator();
+
+  // TODO: add pose estimator to path processor
 
   m_path_processor = new module_path_processor::PathProcessor(feature_tracker, feature_detector, video_reader);
 
@@ -229,6 +280,46 @@ void MainWindow::handle_pause_button()
 }
 
 
+void MainWindow::handle_reader_type_change(int new_value)
+{
+  if (new_value != -1)
+  {
+    m_video_reader_layout->replaceWidget(m_reader_info, static_cast<AbstractInfoQtFrame *>(m_video_reader_box->itemData(new_value).data()));
+    m_detector_info = static_cast<AbstractInfoQtFrame *>(m_video_reader_box->itemData(new_value).data());
+  }
+}
+
+
+void MainWindow::handle_detector_type_change(int new_value)
+{
+  if (new_value != -1)
+  {
+    m_feature_detector_layout->replaceWidget(m_detector_info, static_cast<AbstractInfoQtFrame *>(m_feature_detector_box->itemData(new_value).data()));
+    m_detector_info = static_cast<AbstractInfoQtFrame *>(m_feature_detector_box->itemData(new_value).data());
+  }
+}
+
+
+void MainWindow::handle_tracker_type_change(int new_value)
+{
+  if (new_value != -1)
+  {
+    m_feature_detector_layout->replaceWidget(m_tracker_info, static_cast<AbstractInfoQtFrame *>(m_feature_tracker_box->itemData(new_value).data()));
+    m_tracker_info = static_cast<AbstractInfoQtFrame *>(m_feature_tracker_box->itemData(new_value).data());
+  }
+}
+
+
+void MainWindow::handle_pose_estimator_type_change(int new_value)
+{
+  if (new_value != -1)
+  {
+    m_pose_estimator_layout->replaceWidget(m_pose_estimator_info, static_cast<AbstractInfoQtFrame *>(m_pose_estimator_box->itemData(new_value).data()));
+    m_pose_estimator_info = static_cast<AbstractInfoQtFrame *>(m_pose_estimator_box->itemData(new_value).data());
+  }
+}
+
+
 void MainWindow::handle_running_mode_change(int new_value)
 {
   switch (new_value)
@@ -270,17 +361,6 @@ void MainWindow::timer_timeout()
   }
 
   qDebug() << "Timer timeout: m_path_processor " << m_path_processor << " is started " << (m_path_processor != nullptr ? m_path_processor->is_started() : 0);
-}
-
-
-void MainWindow::call_video_selection()
-{
-  QString path = QFileDialog::getOpenFileName(this, "Select a video", ".", "Videos (*.mp4 *.avi)");
-
-  if (QFileInfo::exists(path))
-  {
-    m_path_to_video_file = path;
-  }
 }
 
 

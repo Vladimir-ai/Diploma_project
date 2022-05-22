@@ -8,6 +8,7 @@
 #include "FeatureTracker/feature_tracker.h"
 #include "VideoReader/video_reader.h"
 #include "FeatureDetector/feature_detector.h"
+#include "PoseEstimator/abstract_pose_estimator.h"
 #include "Logger/logger.h"
 
 #include <mutex>
@@ -19,6 +20,7 @@ using namespace std;
 using namespace submodule_video_reader;
 using namespace submodule_feature_detector;
 using namespace submodule_feature_tracker;
+using namespace submodule_pose_estimator;
 
 
 namespace module_path_processor
@@ -62,7 +64,7 @@ namespace module_path_processor
 
     void set_logger(abstract_logger *logger);
 
-    void draw_trace(Mat &frame);
+    void draw_trace(Mat &frame, const vector<Point2f> &src_keypoints, const vector<Point2f> &dst_keypoints);
 
     ~PathProcessor();
 
@@ -80,7 +82,6 @@ namespace module_path_processor
     void thread_running(uint8_t job_count);
     void process_frame(uint8_t job_count);
 
-//    do start and pause,
 //    do thread running.
   };
 

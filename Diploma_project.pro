@@ -4,13 +4,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 
+include(Common/Common.pri)
+
 include(Logger/Logger.pri)
 
 include(VideoReader/VideoReader.pri)
 include(FeatureTracker/FeatureTracker.pri)
 include(FeatureDetector/FeatureDetector.pri)
+include(PoseEstimator/PoseEstimator.pri)
 
-include(Common/Common.pri)
 
 include(PathProcessor/PathProcessor.pri)
 

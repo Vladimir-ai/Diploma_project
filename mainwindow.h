@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QComboBox>
 
+#include "Common/qt_gui_properties.h"
 #include "PathProcessor/path_processor.h"
 #include "Logger/logger.h"
 
@@ -18,6 +19,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    static void error_handler(std::string error);
 
 private:
     const int mc_timer_timeout = 1000 / 24;
@@ -38,15 +41,31 @@ private:
     QPushButton *m_pause_btn = nullptr;
     QPushButton *m_continue_btn = nullptr;
 
-    QPushButton *m_select_file_btn = nullptr;
-
     QLabel *m_image_qlabel = nullptr;
 
     QComboBox *m_running_type_selector;
 
-    QString m_path_to_video_file = "/home/krevedko/Desktop/14/image_0/res.mp4";
-
     module_path_processor::PathProcessor *m_path_processor = nullptr;
+
+    AbstractInfoQtFrame *m_detector_info;
+    AbstractInfoQtFrame *m_reader_info;
+    AbstractInfoQtFrame *m_tracker_info;
+    AbstractInfoQtFrame *m_pose_estimator_info;
+
+    QComboBox *m_feature_detector_box;
+    QComboBox *m_video_reader_box;
+    QComboBox *m_feature_tracker_box;
+    QComboBox *m_pose_estimator_box;
+
+    QVBoxLayout *m_feature_detector_layout;
+    QVBoxLayout *m_video_reader_layout;
+    QVBoxLayout *m_feature_tracker_layout;
+    QVBoxLayout *m_pose_estimator_layout;
+
+    inline void init_video_reader_layout(void);
+    inline void init_feature_detector_layout(void);
+    inline void init_feature_tracker_layout(void);
+    inline void init_pose_estimator_layout(void);
 
 protected:
     void setup_layout(void);
@@ -59,10 +78,13 @@ private slots:
   void handle_continue_button();
   void handle_pause_button();
 
+  void handle_reader_type_change(int new_value);
+  void handle_detector_type_change(int new_value);
+  void handle_tracker_type_change(int new_value);
+  void handle_pose_estimator_type_change(int new_value);
+
   void handle_running_mode_change(int new_value);
 
   void timer_timeout();
-  void call_video_selection();
-
 };
 #endif // MAINWINDOW_H
