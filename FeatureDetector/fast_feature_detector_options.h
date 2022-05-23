@@ -15,8 +15,9 @@ private:
   QLineEdit *m_threshold;
   QComboBox *m_type_selection;
   QPushButton *m_nonmax_supression;
+
 public:
-  fast_feature_detector_options(func_error_handler err_handler);
+  fast_feature_detector_options(abstract_logger *logger, func_error_handler err_handler);
   ~fast_feature_detector_options();
 
   // AbstractInfoQtWidget interface

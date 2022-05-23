@@ -8,7 +8,7 @@
 class OpencvFeatureTrackerWidget: public AbstractInfoQtFrame
 {
 public:
-  OpencvFeatureTrackerWidget(func_error_handler error_handler);
+  OpencvFeatureTrackerWidget(abstract_logger *logger, func_error_handler error_handler);
 
   // AbstractInfoQtFrame interface
   submodule_feature_detector::abstract_feature_detector *get_feature_detector();

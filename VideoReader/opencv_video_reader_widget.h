@@ -12,12 +12,13 @@ class OpenCvVideoReaderInfoWidget : public AbstractInfoQtFrame
 private:
   QVBoxLayout *m_layout;
   QPushButton *m_path_button;
-  std::string m_path;
+//  std::string m_path = "/home/krevedko/Desktop/14/image_0/res.mp4";
+  std::string m_path = "/home/krevedko/PyCharmProjects/pyslam/videos/kitti00/video.mp4";
 
   void call_video_selection(void);
 
 public:
-  OpenCvVideoReaderInfoWidget(func_error_handler err_handler);
+  OpenCvVideoReaderInfoWidget(abstract_logger *logger, func_error_handler err_handler);
   ~OpenCvVideoReaderInfoWidget();
 
   // AbstractInfoQtWidget interface

@@ -15,8 +15,9 @@ enum submodule_type
   /* General types */
   READER = 1,
   DETECTOR = 2,
-  FEATURE_TRACKER = 3,
-  ESTIMATOR = 4,
+  FEATURE_TRACKER_WITH_FRAME = 3,
+  FEATURE_TRACKER_WITHOUT_FRAME = 4,
+  ESTIMATOR = 5,
 
   /* Video reader start */
   DYNAMIC_LOADED_READER = 100,

@@ -1,7 +1,8 @@
 #include "opencvfeaturetracker.h"
 #include "opencvfeaturetrackerwidget.h"
 
-OpencvFeatureTrackerWidget::OpencvFeatureTrackerWidget(func_error_handler error_handler):AbstractInfoQtFrame(error_handler)
+OpencvFeatureTrackerWidget::OpencvFeatureTrackerWidget(
+    abstract_logger *logger, func_error_handler error_handler): AbstractInfoQtFrame(logger, error_handler)
 {
 }
 

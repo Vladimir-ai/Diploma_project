@@ -15,11 +15,13 @@ class AbstractInfoQtFrame : public QFrame
   Q_OBJECT
 protected:
   func_error_handler m_error_handler;
+  abstract_logger *m_logger;
 
 public:
-  AbstractInfoQtFrame(func_error_handler err_handler)
+  AbstractInfoQtFrame(abstract_logger *logger, func_error_handler err_handler)
   {
     m_error_handler = err_handler;
+    m_logger = logger;
   };
 
   virtual submodule_feature_detector::abstract_feature_detector *get_feature_detector(void) = 0;

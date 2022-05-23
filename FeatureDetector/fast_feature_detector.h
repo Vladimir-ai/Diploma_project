@@ -12,7 +12,7 @@ private:
   Ptr<FastFeatureDetector> m_detector;
 
 public:
-  fast_feature_detector(int threshold=100,
+  fast_feature_detector(int threshold=10,
                         bool nonmaxSuppression=false,
                         FastFeatureDetector::DetectorType type=FastFeatureDetector::TYPE_9_16);
 

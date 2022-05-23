@@ -9,4 +9,4 @@ SOURCES += \
   $$PWD/opencv_pose_estimator.cpp \
   $$PWD/opencv_pose_estimator_widget.cpp
 
-unix:!macx: LIBS += -lopencv_calib3d
+unix:!macx: LIBS += -lopencv_calib3d -lopencv_imgcodecs -lopencv_highgui

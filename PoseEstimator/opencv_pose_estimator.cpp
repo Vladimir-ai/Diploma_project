@@ -17,10 +17,16 @@ opencv_pose_estimator::opencv_pose_estimator(double focal, Point2d pp, int metho
 
 Mat opencv_pose_estimator::find_matrix(const std::vector<Point2f> &base_points, const std::vector<Point2f> &current_points)
 {
-  Mat rotate_mat, translation_mat;
+  Mat rotate_mat, translation_mat, result(3, 3, CV_64FC1), essential_mat;
 
-  Mat essential_matrix = findEssentialMat(base_points, current_points, m_focal, m_pp, m_method, m_prob, m_threshold);
-  (void) recoverPose(essential_matrix, base_points, current_points, rotate_mat, translation_mat);
-  return rotate_mat * translation_mat;
+  try{
+    Mat essential_matrix(findEssentialMat(current_points, base_points, m_focal, m_pp, m_method, m_prob, m_threshold));
+    (void) recoverPose(essential_matrix, current_points, base_points, rotate_mat, translation_mat);
+    result = rotate_mat * translation_mat;
+  }
+  catch (cv::Exception &error) {
+  }
+
+  return result;
 }
 

@@ -4,7 +4,8 @@
 #include <QFileDialog>
 
 
-OpenCvVideoReaderInfoWidget::OpenCvVideoReaderInfoWidget(func_error_handler err_handler): AbstractInfoQtFrame(err_handler)
+OpenCvVideoReaderInfoWidget::OpenCvVideoReaderInfoWidget(
+    abstract_logger *logger, func_error_handler err_handler): AbstractInfoQtFrame(logger, err_handler)
 {
   m_layout = new QVBoxLayout(this);
   m_path_button = new QPushButton("Select file");

@@ -5,7 +5,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-fast_feature_detector_options::fast_feature_detector_options(func_error_handler err_handler): AbstractInfoQtFrame(err_handler)
+fast_feature_detector_options::fast_feature_detector_options(
+    abstract_logger *logger, func_error_handler err_handler): AbstractInfoQtFrame(logger, err_handler)
 {
   m_layout = new QVBoxLayout(this);
   m_threshold = new QLineEdit();
@@ -14,7 +15,7 @@ fast_feature_detector_options::fast_feature_detector_options(func_error_handler 
   m_nonmax_supression = new QPushButton("Nonmax Supression");
   QLabel *threshold_qlabel = new QLabel("Threshold");
   m_threshold->setValidator(new QDoubleValidator(0, 1000, 2));
-  m_threshold->setText("100");
+  m_threshold->setText("10");
 
   QLabel *type_label = new QLabel("N");
   m_type_selection->addItem("N = 8", FastFeatureDetector::DetectorType::TYPE_5_8);

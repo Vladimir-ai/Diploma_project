@@ -10,6 +10,7 @@
 #include "FeatureDetector/feature_detector.h"
 #include "PoseEstimator/abstract_pose_estimator.h"
 #include "Logger/logger.h"
+#include "pathdrawer.h"
 
 #include <mutex>
 #include <condition_variable>
@@ -28,7 +29,7 @@ namespace module_path_processor
   /* It should only run file or sth with selected features */
   class PathProcessor
   {
-  protected:
+  private:
     std::mutex m_img_mutex;
     std::mutex m_running_mutex;
     std::condition_variable m_cond_variable;
@@ -44,23 +45,18 @@ namespace module_path_processor
     abstract_feature_tracker *m_feature_tracker = nullptr;
     abstract_feature_detector *m_feature_detector = nullptr;
     abstract_video_reader *m_video_reader = nullptr;
+    abstract_pose_estimator *m_pose_estimator = nullptr;
 
     abstract_logger *m_logger = nullptr;
 
+    PathDrawer *m_path_drawer;
+
   public:
-    PathProcessor();
-
     PathProcessor(abstract_feature_tracker *feature_tracker,
-                abstract_feature_detector *feature_detector,
-                abstract_video_reader *video_reader);
-
-    void set_feature_tracker(abstract_feature_tracker *feature_tracker);
-    void set_feature_detector(abstract_feature_detector *feature_detector);
-    void set_video_reader(abstract_video_reader *video_reader);
-
-    void get_feature_tracker(abstract_feature_tracker *feature_tracker);
-    void get_feature_detector(abstract_feature_detector *feature_detector);
-    void get_video_reader(abstract_video_reader *video_reader);
+                  abstract_feature_detector *feature_detector,
+                  abstract_video_reader *video_reader,
+                  abstract_pose_estimator *pose_estimator,
+                  PathDrawer *path_drawer);
 
     void set_logger(abstract_logger *logger);
 
@@ -77,6 +73,8 @@ namespace module_path_processor
     void pause(void);
     void continue_running(void);
     void stop(void);
+
+    Mat get_path_as_img(void);
 
   private:
     void thread_running(uint8_t job_count);
