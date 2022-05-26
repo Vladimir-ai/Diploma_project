@@ -9,21 +9,21 @@ using namespace cv;
 
 Mat read_next_frame(void);
 
-namespace submodule_video_reader
+namespace SubmoduleVideoReader
 {
-  class abstract_video_reader
+  class IAbstractVideoReader
   {
   protected:
     uint64_t m_frame_num;
     Mat m_previous_frame;
     Mat m_current_frame;
 
-    abstract_logger *m_logger;
+    AbstractLogger *m_logger;
 
   public:
-    virtual ~abstract_video_reader() = default;
+    virtual ~IAbstractVideoReader() = default;
 
-    virtual void set_logger(abstract_logger *logger) = 0;
+    virtual void set_logger(AbstractLogger *logger) = 0;
 
     virtual uint64_t get_current_frame_num(void) = 0;
 

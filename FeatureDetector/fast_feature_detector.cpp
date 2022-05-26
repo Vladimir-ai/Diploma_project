@@ -1,29 +1,35 @@
 #include "fast_feature_detector.h"
 
-fast_feature_detector::fast_feature_detector(int threshold,
-                                             bool nonmaxSuppression,
-                                             FastFeatureDetector::DetectorType type)
+
+OpencvFastFeatureDetector::OpencvFastFeatureDetector(Statistics *stat,
+                                                     int threshold,
+                                                     bool nonmaxSuppression,
+                                                     FastFeatureDetector::DetectorType type): IAbstractFeatureDetector(stat)
 {
   m_detector = FastFeatureDetector::create(threshold, nonmaxSuppression, type);
 }
 
-
-bool fast_feature_detector::detect_features(cv::Mat frame, std::vector<Point2f> &points)
+bool OpencvFastFeatureDetector::detect_features(Mat frame, std::vector<Point2f> &points)
 {
   vector<KeyPoint> kp;
+  const clock_t begin_time = clock();
 
   m_detector->detect(frame, kp);
   KeyPoint::convert(kp, points);
+
+  m_stat->add_statistics(FEATURE_DETECTOR, "FAST Detector current time: ", (double) (clock() - begin_time) / CLOCKS_PER_SEC);
+  m_stat->add_statistics(FEATURE_DETECTOR, "FAST Detector average time: ", (double) (clock() - begin_time) / CLOCKS_PER_SEC, true);
+
   return true;
 }
 
-
-
-fast_feature_detector::~fast_feature_detector()
+OpencvFastFeatureDetector::~OpencvFastFeatureDetector()
 {
+
 }
 
-void fast_feature_detector::reset()
+void OpencvFastFeatureDetector::reset()
 {
   m_detector.reset();
 }
+

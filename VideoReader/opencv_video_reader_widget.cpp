@@ -5,7 +5,7 @@
 
 
 OpenCvVideoReaderInfoWidget::OpenCvVideoReaderInfoWidget(
-    abstract_logger *logger, func_error_handler err_handler): AbstractInfoQtFrame(logger, err_handler)
+    Statistics *stat, AbstractLogger *logger, FuncErrorHandler err_handler): AbstractInfoQtFrame(stat, logger, err_handler)
 {
   m_layout = new QVBoxLayout(this);
   m_path_button = new QPushButton("Select file");
@@ -39,25 +39,25 @@ OpenCvVideoReaderInfoWidget::~OpenCvVideoReaderInfoWidget()
 }
 
 
-submodule_feature_detector::abstract_feature_detector *OpenCvVideoReaderInfoWidget::get_feature_detector()
+SubmoduleFeatureDetector::IAbstractFeatureDetector *OpenCvVideoReaderInfoWidget::get_feature_detector()
 {
   return nullptr;
 }
 
 
-submodule_feature_tracker::abstract_feature_tracker *OpenCvVideoReaderInfoWidget::get_feature_tracker()
+SubmoduleFeatureTracker::IAbstractFeatureTracker *OpenCvVideoReaderInfoWidget::get_feature_tracker()
 {
   return nullptr;
 }
 
 
-submodule_video_reader::abstract_video_reader *OpenCvVideoReaderInfoWidget::get_video_reader()
+SubmoduleVideoReader::IAbstractVideoReader *OpenCvVideoReaderInfoWidget::get_video_reader()
 {
-  abstract_video_reader *result = nullptr;
+  IAbstractVideoReader *result = nullptr;
 
   if (!m_path.empty())
   {
-    result = new open_cv_video_reader(m_path);
+    result = new OpencvVideoReader(m_path);
   }
   else
   {
@@ -68,7 +68,7 @@ submodule_video_reader::abstract_video_reader *OpenCvVideoReaderInfoWidget::get_
 }
 
 
-submodule_pose_estimator::abstract_pose_estimator *OpenCvVideoReaderInfoWidget::get_pose_estimator()
+SubmodulePoseEstimator::IAbstractPoseEstimator *OpenCvVideoReaderInfoWidget::get_pose_estimator()
 {
   return nullptr;
 }

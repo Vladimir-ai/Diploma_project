@@ -8,7 +8,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 
-class fast_feature_detector_options : public AbstractInfoQtFrame
+class FastFeatureDetectorOptions : public AbstractInfoQtFrame
 {
 private:
   QVBoxLayout *m_layout;
@@ -17,14 +17,14 @@ private:
   QPushButton *m_nonmax_supression;
 
 public:
-  fast_feature_detector_options(abstract_logger *logger, func_error_handler err_handler);
-  ~fast_feature_detector_options();
+  FastFeatureDetectorOptions(Statistics *stat, AbstractLogger *logger, FuncErrorHandler err_handler);
+  ~FastFeatureDetectorOptions();
 
   // AbstractInfoQtWidget interface
-  submodule_feature_detector::abstract_feature_detector *get_feature_detector() override;
-  submodule_feature_tracker::abstract_feature_tracker *get_feature_tracker() override;
-  submodule_video_reader::abstract_video_reader *get_video_reader() override;
-  submodule_pose_estimator::abstract_pose_estimator *get_pose_estimator() override;
+  SubmoduleFeatureDetector::IAbstractFeatureDetector *get_feature_detector() override;
+  SubmoduleFeatureTracker::IAbstractFeatureTracker *get_feature_tracker() override;
+  SubmoduleVideoReader::IAbstractVideoReader *get_video_reader() override;
+  SubmodulePoseEstimator::IAbstractPoseEstimator *get_pose_estimator() override;
   submodule_type get_type() override;
   string get_name() override;
 };

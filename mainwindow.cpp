@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
   setup_timer();
 
   m_drawer_widget = new PathDrawerQWidget();
+  m_drawer_widget->set_stat(&m_statistics);
 }
 
 
@@ -57,7 +58,7 @@ inline void MainWindow::init_video_reader_layout()
   QLabel *video_reader_label = new QLabel("Video Reader type:");
   m_video_reader_box = new QComboBox();
 
-  m_reader_info = new OpenCvVideoReaderInfoWidget(m_logger, error_handler);
+  m_reader_info = new OpenCvVideoReaderInfoWidget(&m_statistics, m_logger, error_handler);
   m_video_reader_box->addItem(QString::fromStdString(m_reader_info->get_name()), QVariant::fromValue(m_reader_info));
   m_video_reader_layout->addWidget(video_reader_label);
   m_video_reader_layout->addWidget(m_video_reader_box);
@@ -72,7 +73,7 @@ inline void MainWindow::init_feature_detector_layout()
   QLabel *feature_detector_label = new QLabel("Feature Detector type:");
   m_feature_detector_box = new QComboBox();
 
-  m_detector_info = new fast_feature_detector_options(m_logger, error_handler);
+  m_detector_info = new FastFeatureDetectorOptions(&m_statistics, m_logger, error_handler);
 
   m_feature_detector_box->addItem(QString::fromStdString(m_detector_info->get_name()), QVariant::fromValue(m_detector_info));
   m_feature_detector_layout->addWidget(feature_detector_label);
@@ -88,7 +89,7 @@ void MainWindow::init_feature_tracker_layout()
   QLabel *feature_tracker_label = new QLabel("Feature Tracker type:");
   m_feature_tracker_box = new QComboBox();
 
-  m_tracker_info = new OpencvFeatureTrackerWidget(m_logger, error_handler);
+  m_tracker_info = new OpencvFeatureTrackerWidget(&m_statistics, m_logger, error_handler);
 
   m_feature_tracker_box->addItem(QString::fromStdString(m_tracker_info->get_name()), QVariant::fromValue(m_tracker_info));
   m_feature_tracker_layout->addWidget(feature_tracker_label);
@@ -103,7 +104,7 @@ void MainWindow::init_pose_estimator_layout()
   QLabel *pose_estimator_label = new QLabel("Pose estimator type:");
   m_pose_estimator_box = new QComboBox();
 
-  m_pose_estimator_info = new OpencvPoseEstimatorWidget(m_logger, error_handler);
+  m_pose_estimator_info = new OpencvPoseEstimatorWidget(&m_statistics, m_logger, error_handler);
 
   m_pose_estimator_box->addItem(QString::fromStdString(m_pose_estimator_info->get_name()), QVariant::fromValue(m_pose_estimator_info));
 
@@ -204,10 +205,10 @@ void MainWindow::handle_start_button()
     delete m_path_processor;
   }
 
-  abstract_feature_detector *feature_detector = m_detector_info->get_feature_detector();
-  abstract_video_reader *video_reader = m_reader_info->get_video_reader();
-  abstract_feature_tracker *feature_tracker = m_tracker_info->get_feature_tracker();
-  abstract_pose_estimator *pose_estimator = m_pose_estimator_info->get_pose_estimator();
+  IAbstractFeatureDetector *feature_detector = m_detector_info->get_feature_detector();
+  IAbstractVideoReader *video_reader = m_reader_info->get_video_reader();
+  IAbstractFeatureTracker *feature_tracker = m_tracker_info->get_feature_tracker();
+  IAbstractPoseEstimator *pose_estimator = m_pose_estimator_info->get_pose_estimator();
   PathDrawer *path_drawer = new PathDrawer(m_logger);
 
   if (m_drawer_widget->get_path_drawer())
@@ -218,11 +219,12 @@ void MainWindow::handle_start_button()
 
   // TODO: add pose estimator to path processor
 
-  m_path_processor = new module_path_processor::PathProcessor(feature_tracker,
-                                                              feature_detector,
-                                                              video_reader,
-                                                              pose_estimator,
-                                                              path_drawer);
+  m_path_processor = new ModulePathProcessor::PathProcessor(feature_tracker,
+                                                            feature_detector,
+                                                            video_reader,
+                                                            pose_estimator,
+                                                            path_drawer,
+                                                            &m_statistics);
 
   m_path_processor->set_logger(m_logger);
 

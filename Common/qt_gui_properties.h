@@ -14,20 +14,22 @@ class AbstractInfoQtFrame : public QFrame
 {
   Q_OBJECT
 protected:
-  func_error_handler m_error_handler;
-  abstract_logger *m_logger;
+  FuncErrorHandler m_error_handler;
+  AbstractLogger *m_logger;
+  Statistics *m_stat;
 
 public:
-  AbstractInfoQtFrame(abstract_logger *logger, func_error_handler err_handler)
+  AbstractInfoQtFrame(Statistics *stat, AbstractLogger *logger, FuncErrorHandler err_handler)
   {
     m_error_handler = err_handler;
     m_logger = logger;
+    m_stat = stat;
   };
 
-  virtual submodule_feature_detector::abstract_feature_detector *get_feature_detector(void) = 0;
-  virtual submodule_feature_tracker::abstract_feature_tracker *get_feature_tracker(void) = 0;
-  virtual submodule_video_reader::abstract_video_reader *get_video_reader(void) = 0;
-  virtual submodule_pose_estimator::abstract_pose_estimator *get_pose_estimator(void) = 0;
+  virtual SubmoduleFeatureDetector::IAbstractFeatureDetector *get_feature_detector() = 0;
+  virtual SubmoduleFeatureTracker::IAbstractFeatureTracker *get_feature_tracker() = 0;
+  virtual SubmoduleVideoReader::IAbstractVideoReader *get_video_reader() = 0;
+  virtual SubmodulePoseEstimator::IAbstractPoseEstimator *get_pose_estimator() = 0;
   virtual submodule_type get_type(void) = 0;
   virtual std::string get_name(void) = 0;
 };

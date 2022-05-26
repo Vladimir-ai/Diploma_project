@@ -27,7 +27,7 @@ public:
 
 private:
   const int mc_timer_timeout = 1000 / 24;
-  abstract_logger *m_logger = nullptr;
+  AbstractLogger *m_logger = nullptr;
 
   QTimer *m_timer = nullptr;
   QWidget *m_central_widget = nullptr;
@@ -48,7 +48,7 @@ private:
 
   QComboBox *m_running_type_selector;
 
-  module_path_processor::PathProcessor *m_path_processor = nullptr;
+  ModulePathProcessor::PathProcessor *m_path_processor = nullptr;
 
   AbstractInfoQtFrame *m_detector_info;
   AbstractInfoQtFrame *m_reader_info;
@@ -66,6 +66,7 @@ private:
   QVBoxLayout *m_pose_estimator_layout;
 
   PathDrawerQWidget *m_drawer_widget;
+  Statistics m_statistics; // Send it to every object! Also allow path_processor to access its fields!
 
   inline void init_video_reader_layout(void);
   inline void init_feature_detector_layout(void);

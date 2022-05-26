@@ -2,30 +2,30 @@
 #include "opencvfeaturetrackerwidget.h"
 
 OpencvFeatureTrackerWidget::OpencvFeatureTrackerWidget(
-    abstract_logger *logger, func_error_handler error_handler): AbstractInfoQtFrame(logger, error_handler)
+    Statistics *stat, AbstractLogger *logger, FuncErrorHandler error_handler): AbstractInfoQtFrame(stat, logger, error_handler)
 {
 }
 
 
-submodule_feature_detector::abstract_feature_detector *OpencvFeatureTrackerWidget::get_feature_detector()
-{
-  return nullptr;
-}
-
-
-submodule_feature_tracker::abstract_feature_tracker *OpencvFeatureTrackerWidget::get_feature_tracker()
-{
-  return new OpencvFeatureTracker();
-}
-
-
-submodule_video_reader::abstract_video_reader *OpencvFeatureTrackerWidget::get_video_reader()
+SubmoduleFeatureDetector::IAbstractFeatureDetector *OpencvFeatureTrackerWidget::get_feature_detector()
 {
   return nullptr;
 }
 
 
-submodule_pose_estimator::abstract_pose_estimator *OpencvFeatureTrackerWidget::get_pose_estimator()
+SubmoduleFeatureTracker::IAbstractFeatureTracker *OpencvFeatureTrackerWidget::get_feature_tracker()
+{
+  return new OpencvFeatureTracker(m_stat);
+}
+
+
+SubmoduleVideoReader::IAbstractVideoReader *OpencvFeatureTrackerWidget::get_video_reader()
+{
+  return nullptr;
+}
+
+
+SubmodulePoseEstimator::IAbstractPoseEstimator *OpencvFeatureTrackerWidget::get_pose_estimator()
 {
   return nullptr;
 }

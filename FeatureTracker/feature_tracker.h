@@ -2,18 +2,20 @@
 #define FEATURE_TRACKER_H
 
 #include "Common/common.h"
+#include "Common/statistics.h"
 #include <opencv2/core/mat.hpp>
 #include <vector>
 
 using namespace cv;
 using namespace std;
 
-namespace submodule_feature_tracker
+namespace SubmoduleFeatureTracker
 {
-  class abstract_feature_tracker
+  class IAbstractFeatureTracker: public IStatisticsImpl
   {
   public:
-    virtual ~abstract_feature_tracker() = default;
+    IAbstractFeatureTracker(Statistics *stat): IStatisticsImpl(stat){};
+    virtual ~IAbstractFeatureTracker() = default;
 
     virtual bool track_features(vector<Point2f>& v_src_points, vector<Point2f>& v_dst_points) = 0;
     virtual bool track_features(Mat& frame_src, Mat &frame_dst,

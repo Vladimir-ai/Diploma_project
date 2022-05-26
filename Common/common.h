@@ -50,6 +50,6 @@ enum submodule_type
 
 enum submodule_type convert_to_general_type(enum submodule_type local_type);
 
-typedef void (*func_error_handler)(std::string error);
+typedef void (*FuncErrorHandler)(std::string error);
 
 #endif // COMMON_H

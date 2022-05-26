@@ -18,13 +18,13 @@
 
 using namespace cv;
 using namespace std;
-using namespace submodule_video_reader;
-using namespace submodule_feature_detector;
-using namespace submodule_feature_tracker;
-using namespace submodule_pose_estimator;
+using namespace SubmoduleVideoReader;
+using namespace SubmoduleFeatureDetector;
+using namespace SubmoduleFeatureTracker;
+using namespace SubmodulePoseEstimator;
 
 
-namespace module_path_processor
+namespace ModulePathProcessor
 {
   /* It should only run file or sth with selected features */
   class PathProcessor
@@ -42,23 +42,25 @@ namespace module_path_processor
     bool m_is_stopped = false;
     submodule_type m_running_type;
 
-    abstract_feature_tracker *m_feature_tracker = nullptr;
-    abstract_feature_detector *m_feature_detector = nullptr;
-    abstract_video_reader *m_video_reader = nullptr;
-    abstract_pose_estimator *m_pose_estimator = nullptr;
+    IAbstractFeatureTracker *m_feature_tracker = nullptr;
+    IAbstractFeatureDetector *m_feature_detector = nullptr;
+    IAbstractVideoReader *m_video_reader = nullptr;
+    IAbstractPoseEstimator *m_pose_estimator = nullptr;
 
-    abstract_logger *m_logger = nullptr;
+    AbstractLogger *m_logger = nullptr;
 
     PathDrawer *m_path_drawer;
+    Statistics *m_stat = nullptr;
 
   public:
-    PathProcessor(abstract_feature_tracker *feature_tracker,
-                  abstract_feature_detector *feature_detector,
-                  abstract_video_reader *video_reader,
-                  abstract_pose_estimator *pose_estimator,
-                  PathDrawer *path_drawer);
+    PathProcessor(IAbstractFeatureTracker *feature_tracker,
+                  IAbstractFeatureDetector *feature_detector,
+                  IAbstractVideoReader *video_reader,
+                  IAbstractPoseEstimator *pose_estimator,
+                  PathDrawer *path_drawer,
+                  Statistics *stat);
 
-    void set_logger(abstract_logger *logger);
+    void set_logger(AbstractLogger *logger);
 
     void draw_trace(Mat &frame, const vector<Point2f> &src_keypoints, const vector<Point2f> &dst_keypoints);
 
@@ -82,10 +84,6 @@ namespace module_path_processor
 
 //    do thread running.
   };
-
-  abstract_feature_detector *construct_feature_detector(submodule_type detector_type);
-  abstract_feature_tracker *construct_feature_tracker(submodule_type tracker_type);
-  abstract_video_reader *construct_video_reader(submodule_type reader_type, std::string path = "");
 }
 
 #endif // PATH_PROCESSOR_H

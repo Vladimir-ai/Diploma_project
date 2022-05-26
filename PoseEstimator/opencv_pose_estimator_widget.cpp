@@ -9,6 +9,7 @@
 inline std::vector<Point3f> OpencvPoseEstimatorWidget::init_world_coordinates(const int rows, const int cols)
 {
   std::vector<cv::Point3f> objp;
+
   for(int column = 0; column < cols; column++)
   {
     for(int row = 0; row < rows; row++)
@@ -19,7 +20,7 @@ inline std::vector<Point3f> OpencvPoseEstimatorWidget::init_world_coordinates(co
 }
 
 
-OpencvPoseEstimatorWidget::OpencvPoseEstimatorWidget(abstract_logger *logger, func_error_handler err_handler): AbstractInfoQtFrame(logger, err_handler)
+OpencvPoseEstimatorWidget::OpencvPoseEstimatorWidget(Statistics *stat, AbstractLogger *logger, FuncErrorHandler err_handler): AbstractInfoQtFrame(stat, logger, err_handler)
 {
   m_layout = new QVBoxLayout(this);
   m_camera_matrix_push_button = new QPushButton("Cam calibration data");
@@ -40,27 +41,27 @@ OpencvPoseEstimatorWidget::OpencvPoseEstimatorWidget(abstract_logger *logger, fu
 }
 
 
-submodule_feature_detector::abstract_feature_detector *OpencvPoseEstimatorWidget::get_feature_detector()
+SubmoduleFeatureDetector::IAbstractFeatureDetector *OpencvPoseEstimatorWidget::get_feature_detector()
 {
   return nullptr;
 }
 
 
-submodule_feature_tracker::abstract_feature_tracker *OpencvPoseEstimatorWidget::get_feature_tracker()
+SubmoduleFeatureTracker::IAbstractFeatureTracker *OpencvPoseEstimatorWidget::get_feature_tracker()
 {
   return nullptr;
 }
 
 
-submodule_video_reader::abstract_video_reader *OpencvPoseEstimatorWidget::get_video_reader()
+SubmoduleVideoReader::IAbstractVideoReader *OpencvPoseEstimatorWidget::get_video_reader()
 {
   return nullptr;
 }
 
 
-submodule_pose_estimator::abstract_pose_estimator *OpencvPoseEstimatorWidget::get_pose_estimator()
+SubmodulePoseEstimator::IAbstractPoseEstimator *OpencvPoseEstimatorWidget::get_pose_estimator()
 {
-  return new submodule_pose_estimator::opencv_pose_estimator();
+  return new SubmodulePoseEstimator::OpencvPoseEstimator(m_stat);
 }
 
 

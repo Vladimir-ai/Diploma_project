@@ -5,8 +5,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-fast_feature_detector_options::fast_feature_detector_options(
-    abstract_logger *logger, func_error_handler err_handler): AbstractInfoQtFrame(logger, err_handler)
+FastFeatureDetectorOptions::FastFeatureDetectorOptions(
+    Statistics *stat, AbstractLogger *logger, FuncErrorHandler err_handler): AbstractInfoQtFrame(stat, logger, err_handler)
 {
   m_layout = new QVBoxLayout(this);
   m_threshold = new QLineEdit();
@@ -15,7 +15,7 @@ fast_feature_detector_options::fast_feature_detector_options(
   m_nonmax_supression = new QPushButton("Nonmax Supression");
   QLabel *threshold_qlabel = new QLabel("Threshold");
   m_threshold->setValidator(new QDoubleValidator(0, 1000, 2));
-  m_threshold->setText("10");
+  m_threshold->setText("16");
 
   QLabel *type_label = new QLabel("N");
   m_type_selection->addItem("N = 8", FastFeatureDetector::DetectorType::TYPE_5_8);
@@ -23,6 +23,7 @@ fast_feature_detector_options::fast_feature_detector_options(
   m_type_selection->addItem("N = 16", FastFeatureDetector::DetectorType::TYPE_9_16);
 
   m_nonmax_supression->setCheckable(true);
+  m_nonmax_supression->setChecked(true);
 
   m_layout->addWidget(threshold_qlabel);
   m_layout->addWidget(m_threshold);
@@ -41,45 +42,45 @@ fast_feature_detector_options::fast_feature_detector_options(
 }
 
 
-fast_feature_detector_options::~fast_feature_detector_options()
+FastFeatureDetectorOptions::~FastFeatureDetectorOptions()
 {
   delete m_layout;
   delete m_threshold;
 }
 
 
-submodule_feature_detector::abstract_feature_detector *fast_feature_detector_options::get_feature_detector()
+SubmoduleFeatureDetector::IAbstractFeatureDetector *FastFeatureDetectorOptions::get_feature_detector()
 {
-  return new fast_feature_detector(m_threshold->text().toDouble(),
+  return new OpencvFastFeatureDetector(m_stat, m_threshold->text().toDouble(),
                                    m_nonmax_supression->isChecked(),
                                    (FastFeatureDetector::DetectorType) m_type_selection->currentData().toInt());
 }
 
 
-submodule_feature_tracker::abstract_feature_tracker *fast_feature_detector_options::get_feature_tracker()
+SubmoduleFeatureTracker::IAbstractFeatureTracker *FastFeatureDetectorOptions::get_feature_tracker()
 {
   return nullptr;
 }
 
 
-submodule_video_reader::abstract_video_reader *fast_feature_detector_options::get_video_reader()
+SubmoduleVideoReader::IAbstractVideoReader *FastFeatureDetectorOptions::get_video_reader()
 {
   return nullptr;
 }
 
 
-submodule_pose_estimator::abstract_pose_estimator *fast_feature_detector_options::get_pose_estimator()
+SubmodulePoseEstimator::IAbstractPoseEstimator *FastFeatureDetectorOptions::get_pose_estimator()
 {
   return nullptr;
 }
 
 
-submodule_type fast_feature_detector_options::get_type()
+submodule_type FastFeatureDetectorOptions::get_type()
 {
   return FAST_DETECTOR;
 }
 
-string fast_feature_detector_options::get_name()
+string FastFeatureDetectorOptions::get_name()
 {
   return "FAST";
 }

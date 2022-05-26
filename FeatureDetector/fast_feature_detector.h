@@ -4,20 +4,20 @@
 #include "feature_detector.h"
 #include <opencv2/features2d.hpp>
 
-using namespace submodule_feature_detector;
+using namespace SubmoduleFeatureDetector;
 
-class fast_feature_detector : public abstract_feature_detector
+class OpencvFastFeatureDetector : public IAbstractFeatureDetector
 {
 private:
   Ptr<FastFeatureDetector> m_detector;
 
 public:
-  fast_feature_detector(int threshold=10,
+  OpencvFastFeatureDetector(Statistics *stat = nullptr, int threshold=10,
                         bool nonmaxSuppression=false,
                         FastFeatureDetector::DetectorType type=FastFeatureDetector::TYPE_9_16);
 
   bool detect_features(cv::Mat frame, std::vector<Point2f> &points);
-  ~fast_feature_detector();
+  ~OpencvFastFeatureDetector();
 
   void reset();
 };

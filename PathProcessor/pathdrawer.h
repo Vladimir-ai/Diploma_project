@@ -12,18 +12,24 @@ using namespace cv;
 class PathDrawer
 {
 private:
-  static const int mc_width = 400, mc_height = 400;
-  double m_x = mc_width / 2, m_y = mc_height / 2;
+  static const int mc_width = 800, mc_height = 800;
+  static constexpr double scale = 0.1;
+
+  double m_x = 0, m_y = 0;
+
   Mat m_trajectory;
-  abstract_logger *m_logger;
+  AbstractLogger *m_logger;
   std::mutex m_mutex;
+  Mat curr_t;
+  Mat curr_R;
 
 public:
-  PathDrawer(abstract_logger *logger);
+  PathDrawer(AbstractLogger *logger);
 
-  void set_logger(abstract_logger *logger);
-  void update_pos(Mat position_update);
-  Mat get_img();
+  void set_logger(AbstractLogger *logger);
+  void update_pos(Mat R, Mat t);
+  Mat get_img(void);
+  void reset(void);
 
   static int get_width(void);
   static int get_heigth(void);

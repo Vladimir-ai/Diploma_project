@@ -5,7 +5,7 @@
 
 
 
-class BoostLogger : public abstract_logger
+class BoostLogger : public AbstractLogger
 {
 public:
   BoostLogger(std::string path);

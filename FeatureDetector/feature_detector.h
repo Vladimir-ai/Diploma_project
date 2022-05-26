@@ -1,18 +1,20 @@
 #ifndef FEATURE_DETECTOR_H
 #define FEATURE_DETECTOR_H
 
+#include "Common/statistics.h"
 #include <opencv2/core/mat.hpp>
 #include <vector>
 
 using namespace cv;
 using namespace std;
 
-namespace submodule_feature_detector
+namespace SubmoduleFeatureDetector
 {
-  class abstract_feature_detector
+  class IAbstractFeatureDetector: public IStatisticsImpl
   {
   public:
-    virtual ~abstract_feature_detector() = default;
+    IAbstractFeatureDetector(Statistics *stat): IStatisticsImpl(stat){};
+    virtual ~IAbstractFeatureDetector() = default;
 
     virtual bool detect_features(cv::Mat frame, vector<Point2f>& points) = 0;
 

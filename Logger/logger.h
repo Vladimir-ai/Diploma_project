@@ -21,10 +21,10 @@
 }
 
 
-class abstract_logger
+class AbstractLogger
 {
 public:
-  virtual ~abstract_logger() = default;
+  virtual ~AbstractLogger() = default;
 
   virtual void log_info(std::string msg, std::string filename, uint64_t line) = 0;
 

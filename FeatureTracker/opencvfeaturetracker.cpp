@@ -2,8 +2,28 @@
 #include <opencv2/opencv.hpp>
 
 
-OpencvFeatureTracker::OpencvFeatureTracker(uint8_t window_width, uint8_t window_height,
-                                           TermCriteria::Type criteria_type, int max_count, double epsilon)
+void OpencvFeatureTracker::filter_values_out(std::vector<Point2f> &src_pts, std::vector<Point2f> &dst_pts, std::vector<uint8_t> &status)
+{
+  vector<uint8_t>::reverse_iterator iter;
+  const auto status_size = status.size();
+
+  for (iter = status.rbegin(); iter < status.rend(); iter++)
+  {
+    if (!*iter)
+    {
+      const auto offset = (iter - status.rbegin());
+      src_pts.erase(src_pts.begin() + (status_size - offset - 1));
+      dst_pts.erase(dst_pts.begin() + (status_size - offset - 1));
+    }
+  }
+}
+
+
+OpencvFeatureTracker::OpencvFeatureTracker(Statistics *stat, uint8_t window_width,
+                                           uint8_t window_height,
+                                           TermCriteria::Type criteria_type,
+                                           int max_count,
+                                           double epsilon): SubmoduleFeatureTracker::IAbstractFeatureTracker(stat)
 {
   m_termcriteria = new TermCriteria(criteria_type, max_count, epsilon);
   m_winsize = Size(window_width, window_height);
@@ -25,9 +45,17 @@ bool OpencvFeatureTracker::track_features(std::vector<Point2f> &v_src_points, st
 
 bool OpencvFeatureTracker::track_features(Mat &frame_src, Mat &frame_dst, std::vector<Point2f> &v_src_points, std::vector<Point2f> &v_dst_points)
 {
-  vector<uchar> arr;
+  vector<uchar> status;
   vector<float> error;
-  cv::calcOpticalFlowPyrLK(frame_src, frame_dst, v_src_points, v_dst_points, arr, error, m_winsize, 3, *m_termcriteria);
+  clock_t begin_time = clock();
+
+  cv::calcOpticalFlowPyrLK(frame_src, frame_dst, v_src_points, v_dst_points, status, error, m_winsize, 3, *m_termcriteria);  
+
+  m_stat->add_statistics(FEATURE_TRACKER, "Lucas-Kanade tracker current time: ", (double) (clock() - begin_time) / CLOCKS_PER_SEC);
+  m_stat->add_statistics(FEATURE_TRACKER, "Lucas-Kanade tracker average time: ", (double) (clock() - begin_time) / CLOCKS_PER_SEC, true);
+
+  filter_values_out(v_src_points, v_dst_points, status);
+
   return true;
 }
 
@@ -40,5 +68,5 @@ void OpencvFeatureTracker::reset()
 
 submodule_type OpencvFeatureTracker::get_type()
 {
-  return OPENCV_FEATURE_TRACKER;
+  return FEATURE_TRACKER_WITH_FRAME;
 }

@@ -5,11 +5,12 @@
 #include <thread>
 
 
-module_path_processor::PathProcessor::PathProcessor(abstract_feature_tracker *feature_tracker,
-                                                    abstract_feature_detector *feature_detector,
-                                                    abstract_video_reader *video_reader,
-                                                    abstract_pose_estimator *pose_estimator,
-                                                    PathDrawer *path_drawer)
+ModulePathProcessor::PathProcessor::PathProcessor(IAbstractFeatureTracker *feature_tracker,
+                                                  IAbstractFeatureDetector *feature_detector,
+                                                  IAbstractVideoReader *video_reader,
+                                                  IAbstractPoseEstimator *pose_estimator,
+                                                  PathDrawer *path_drawer,
+                                                  Statistics *stat)
 {
   m_feature_tracker = feature_tracker;
   m_feature_detector = feature_detector;
@@ -17,10 +18,11 @@ module_path_processor::PathProcessor::PathProcessor(abstract_feature_tracker *fe
   m_pose_estimator = pose_estimator;
 
   m_path_drawer = path_drawer;
+  m_stat = stat;
 }
 
 
-void module_path_processor::PathProcessor::set_logger(abstract_logger *logger)
+void ModulePathProcessor::PathProcessor::set_logger(AbstractLogger *logger)
 {
   m_logger = logger;
   m_path_drawer->set_logger(logger);
@@ -28,26 +30,26 @@ void module_path_processor::PathProcessor::set_logger(abstract_logger *logger)
 
 
 /* frame is equal to current, need it to not block mutex */
-void module_path_processor::PathProcessor::draw_trace(Mat &frame, const vector<Point2f> &src_keypoints, const vector<Point2f> &dst_keypoints)
+void ModulePathProcessor::PathProcessor::draw_trace(Mat &frame, const vector<Point2f> &src_keypoints, const vector<Point2f> &dst_keypoints)
 {
   const auto curr_size = dst_keypoints.size();
   const Scalar red(0, 0, 255);
   const Scalar green(0, 255, 0);
 
-  for_each(dst_keypoints.begin(), dst_keypoints.end(),
-           [frame](const Point2f& keypoint){ circle(frame, keypoint, 2, Scalar(0, 0, 255), -1); });
+  for_each(src_keypoints.begin(), src_keypoints.end(),
+           [frame](const Point2f& keypoint){ circle(frame, keypoint, 2, Scalar(0, 0, 255), -1, FILLED); });
 
   if (curr_size == src_keypoints.size())
   {
     for(size_t idx = 0; idx < curr_size; idx++)
     {
-      line(frame, dst_keypoints[idx], src_keypoints[idx], green, 2);
+      line(frame, dst_keypoints[idx], src_keypoints[idx], green, 1, LINE_AA);
     }
   }
 }
 
 
-module_path_processor::PathProcessor::~PathProcessor()
+ModulePathProcessor::PathProcessor::~PathProcessor()
 {
   if (m_feature_tracker != nullptr)
   {
@@ -59,7 +61,7 @@ module_path_processor::PathProcessor::~PathProcessor()
 }
 
 
-Mat module_path_processor::PathProcessor::get_curr_frame()
+Mat ModulePathProcessor::PathProcessor::get_curr_frame()
 {
   Mat img_copy;
 
@@ -74,29 +76,39 @@ Mat module_path_processor::PathProcessor::get_curr_frame()
 }
 
 
-bool module_path_processor::PathProcessor::is_started()
+bool ModulePathProcessor::PathProcessor::is_started()
 {
   return m_is_running;
 }
 
 
-bool module_path_processor::PathProcessor::is_stopped()
+bool ModulePathProcessor::PathProcessor::is_stopped()
 {
   return m_is_stopped;
 }
 
 
-void module_path_processor::PathProcessor::start(submodule_type running_type)
+void ModulePathProcessor::PathProcessor::start(submodule_type running_type)
 {
   m_running_type = running_type;
   m_is_running = true;
+
+  if (m_path_drawer)
+  {
+    m_path_drawer->reset();
+  }
+
+  if (m_stat)
+  {
+    m_stat->m_general_stat.values.clear();
+  }
 
   std::thread thread(&PathProcessor::thread_running, this, 1);
   thread.detach();
 }
 
 
-void module_path_processor::PathProcessor::step()
+void ModulePathProcessor::PathProcessor::step()
 {
   m_running_mutex.lock();
   m_is_running = true;
@@ -106,7 +118,7 @@ void module_path_processor::PathProcessor::step()
 }
 
 
-void module_path_processor::PathProcessor::pause()
+void ModulePathProcessor::PathProcessor::pause()
 {
   m_running_mutex.lock();
   m_is_running = false;
@@ -114,7 +126,7 @@ void module_path_processor::PathProcessor::pause()
 }
 
 
-void module_path_processor::PathProcessor::continue_running()
+void ModulePathProcessor::PathProcessor::continue_running()
 {
   m_running_mutex.lock();
   m_is_running = true;
@@ -123,7 +135,7 @@ void module_path_processor::PathProcessor::continue_running()
   m_cond_variable.notify_one();
 }
 
-void module_path_processor::PathProcessor::stop()
+void ModulePathProcessor::PathProcessor::stop()
 {
   m_is_stopped = true;
   m_is_running = false;
@@ -137,7 +149,7 @@ void module_path_processor::PathProcessor::stop()
 }
 
 
-void module_path_processor::PathProcessor::thread_running(uint8_t job_count)
+void ModulePathProcessor::PathProcessor::thread_running(uint8_t job_count)
 {
   (void)job_count;
 
@@ -193,9 +205,9 @@ void module_path_processor::PathProcessor::thread_running(uint8_t job_count)
 }
 
 
-void module_path_processor::PathProcessor::process_frame(uint8_t job_count)
+void ModulePathProcessor::PathProcessor::process_frame(uint8_t job_count)
 {
-  Mat translation_mat;
+  Mat R = Mat::eye(3, 3, CV_64F), t = Mat::zeros(3, 1, CV_64F);
   (void) job_count;
 
   if (!m_video_reader->is_finished())
@@ -206,34 +218,60 @@ void module_path_processor::PathProcessor::process_frame(uint8_t job_count)
 
     LOG_INFO(m_logger, "Reading video frame: " + std::to_string(m_video_reader->get_current_frame_num()));
 
+
+    const clock_t begin_time = clock();
+
     m_feature_detector->detect_features(frame, m_keypoints[m_current_switch]);
     LOG_INFO(m_logger, "Detecting features: " + std::to_string(m_keypoints[m_current_switch].size()));
 
-    src_keypoints_copy = m_keypoints[!m_current_switch];
-    dst_keypoints_copy = m_keypoints[m_current_switch];
+    src_keypoints_copy = m_keypoints[!m_current_switch]; // always previous
+    dst_keypoints_copy = m_keypoints[m_current_switch];  // always current
 
     /* If haven't found any keypoints, raise error */
     if (m_keypoints[!m_current_switch].size() > 0)
     {
-      if (m_feature_tracker->get_type() == FEATURE_TRACKER_WITH_FRAME)
+      do
       {
-        m_feature_tracker->track_features(m_img[!m_current_switch], frame, src_keypoints_copy, dst_keypoints_copy);
-        LOG_INFO(m_logger, "Detecting features: " + std::to_string(m_keypoints[m_current_switch].size()));
-      }
-      else
-      {
-        m_feature_tracker->track_features(src_keypoints_copy, dst_keypoints_copy);
-      }
+        if (m_feature_tracker->get_type() == FEATURE_TRACKER_WITH_FRAME)
+        {
+          if (!m_feature_tracker->track_features(m_img[!m_current_switch], frame, src_keypoints_copy, dst_keypoints_copy))
+          {
+            break;
+          }
+          LOG_INFO(m_logger, "Detecting features: " + std::to_string(m_keypoints[m_current_switch].size()));
+        }
+        else
+        {
+          if (!m_feature_tracker->track_features(src_keypoints_copy, dst_keypoints_copy))
+          {
+            break;
+          }
+        }
 
-      /* Call it here to block mutex for the least possible time */
-      draw_trace(frame, src_keypoints_copy, dst_keypoints_copy);
 
-      if (src_keypoints_copy.size() > 0 && dst_keypoints_copy.size() > 0)
-      {
-        translation_mat = m_pose_estimator->find_matrix(src_keypoints_copy, dst_keypoints_copy);
-      }
+        if (src_keypoints_copy.size() > 0 && dst_keypoints_copy.size() > 0)
+        {
+          m_pose_estimator->find_matrix(src_keypoints_copy, dst_keypoints_copy, R, t);
+        }
 
-      m_path_drawer->update_pos(translation_mat);
+        if (m_stat)
+        {
+          m_stat->m_general_stat.values.push_back(double(clock() - begin_time) / CLOCKS_PER_SEC);
+        }
+
+        /* Call it here to block mutex for the least possible time */
+        draw_trace(frame, src_keypoints_copy, dst_keypoints_copy);
+
+        std::stringstream ss;
+
+        ss << "Translation x= " << t.at<double>(0)
+           <<", y = " << t.at<double>(1)
+           << ", z = " << t.at<double>(2);
+
+        LOG_INFO(m_logger, ss.str());
+
+        m_path_drawer->update_pos(R, t);
+      }while(0);
     }
     else
     {
@@ -245,50 +283,4 @@ void module_path_processor::PathProcessor::process_frame(uint8_t job_count)
     m_current_switch = !m_current_switch;
     m_img_mutex.unlock();
   }
-}
-
-
-abstract_feature_detector *module_path_processor::construct_feature_detector(submodule_type detector_type)
-{
-  abstract_feature_detector *ret_value = nullptr;
-
-  switch (detector_type) {
-    case FAST_DETECTOR:
-      ret_value = new fast_feature_detector();
-      break;
-
-    default:
-      break;
-  }
-
-  return ret_value;
-}
-
-
-abstract_feature_tracker *module_path_processor::construct_feature_tracker(submodule_type tracker_type)
-{
-  abstract_feature_tracker *ret_value = nullptr;
-
-  switch (tracker_type) {
-    default:
-      break;
-  }
-
-  return ret_value;
-}
-
-
-abstract_video_reader *module_path_processor::construct_video_reader(submodule_type reader_type, string path)
-{
-  abstract_video_reader *ret_value = nullptr;
-
-  switch (reader_type) {
-    case OPENCV_READER:
-      ret_value = new open_cv_video_reader(path);
-      break;
-    default:
-      break;
-  }
-
-  return ret_value;
 }

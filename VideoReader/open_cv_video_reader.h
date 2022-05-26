@@ -2,9 +2,9 @@
 #define OPEN_CV_VIDEO_READER_H
 #include "video_reader.h"
 
-using namespace submodule_video_reader;
+using namespace SubmoduleVideoReader;
 
-class open_cv_video_reader : public abstract_video_reader
+class OpencvVideoReader : public IAbstractVideoReader
 {
 protected:
   std::string m_path_to_file;
@@ -12,14 +12,14 @@ protected:
   VideoCapture *m_cap;
 
 public:
-  open_cv_video_reader(std::string path_to_video);
-  ~open_cv_video_reader();
+  OpencvVideoReader(std::string path_to_video);
+  ~OpencvVideoReader();
 
   // abstract_video_reader interface
 public:
   uint64_t get_current_frame_num();
 
-  void set_logger(abstract_logger *logger);
+  void set_logger(AbstractLogger *logger);
 
   Mat get_current_frame();
   Mat get_previous_frame();
