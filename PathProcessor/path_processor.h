@@ -10,7 +10,7 @@
 #include "FeatureDetector/feature_detector.h"
 #include "PoseEstimator/abstract_pose_estimator.h"
 #include "Logger/logger.h"
-#include "pathdrawer.h"
+#include "PathDrawer/pathdrawer.h"
 
 #include <mutex>
 #include <condition_variable>

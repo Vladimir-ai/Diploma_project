@@ -1,8 +1,8 @@
 #ifndef FAST_FEATURE_DETECTOR_H
 #define FAST_FEATURE_DETECTOR_H
 
-#include "feature_detector.h"
 #include <opencv2/features2d.hpp>
+#include "feature_detector.h"
 
 using namespace SubmoduleFeatureDetector;
 

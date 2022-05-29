@@ -3,7 +3,7 @@
 
 #include <QFrame>
 
-#include <PoseEstimator/abstract_pose_estimator.h>
+#include "PoseEstimator/abstract_pose_estimator.h"
 
 #include "FeatureDetector/feature_detector.h"
 #include "FeatureTracker/feature_tracker.h"

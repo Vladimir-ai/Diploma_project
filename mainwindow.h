@@ -11,7 +11,7 @@
 #include "Common/qt_gui_properties.h"
 #include "PathProcessor/path_processor.h"
 #include "Logger/logger.h"
-#include "PathProcessor/pathdrawerqwidget.h"
+#include "PathDrawer/pathdrawerqwidget.h"
 
 
 class PathDrawerQWidget;

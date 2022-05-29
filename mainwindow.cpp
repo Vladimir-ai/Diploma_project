@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 
   m_drawer_widget = new PathDrawerQWidget();
   m_drawer_widget->set_stat(&m_statistics);
+
+  m_central_widget->setFixedSize(1341, 682);
 }
 
 

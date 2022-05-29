@@ -1,8 +1,8 @@
 #ifndef OPENCV_PATH_ESTIMATOR_H
 #define OPENCV_PATH_ESTIMATOR_H
 
-#include "abstract_pose_estimator.h"
 #include <opencv2/calib3d.hpp>
+#include "abstract_pose_estimator.h"
 
 namespace SubmodulePoseEstimator
 {

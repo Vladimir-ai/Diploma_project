@@ -4,7 +4,6 @@
 #include "feature_tracker.h"
 
 
-
 class OpencvFeatureTracker : public SubmoduleFeatureTracker::IAbstractFeatureTracker
 {
 private:

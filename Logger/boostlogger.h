@@ -4,7 +4,6 @@
 #include "logger.h"
 
 
-
 class BoostLogger : public AbstractLogger
 {
 public:

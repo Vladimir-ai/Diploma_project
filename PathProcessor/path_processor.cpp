@@ -36,16 +36,16 @@ void ModulePathProcessor::PathProcessor::draw_trace(Mat &frame, const vector<Poi
   const Scalar red(0, 0, 255);
   const Scalar green(0, 255, 0);
 
-  for_each(src_keypoints.begin(), src_keypoints.end(),
-           [frame](const Point2f& keypoint){ circle(frame, keypoint, 2, Scalar(0, 0, 255), -1, FILLED); });
-
   if (curr_size == src_keypoints.size())
   {
     for(size_t idx = 0; idx < curr_size; idx++)
     {
-      line(frame, dst_keypoints[idx], src_keypoints[idx], green, 1, LINE_AA);
+      line(frame, dst_keypoints[idx], src_keypoints[idx], green, 2, LINE_AA);
     }
   }
+
+  for_each(src_keypoints.begin(), src_keypoints.end(),
+           [frame](const Point2f& keypoint){ circle(frame, keypoint, 3, Scalar(0, 0, 255), -1, FILLED | LINE_AA); });
 }
 
 
@@ -221,6 +221,7 @@ void ModulePathProcessor::PathProcessor::process_frame(uint8_t job_count)
 
     const clock_t begin_time = clock();
 
+    m_keypoints[m_current_switch].clear();
     m_feature_detector->detect_features(frame, m_keypoints[m_current_switch]);
     LOG_INFO(m_logger, "Detecting features: " + std::to_string(m_keypoints[m_current_switch].size()));
 

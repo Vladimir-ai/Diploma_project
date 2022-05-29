@@ -12,7 +12,7 @@ include(VideoReader/VideoReader.pri)
 include(FeatureTracker/FeatureTracker.pri)
 include(FeatureDetector/FeatureDetector.pri)
 include(PoseEstimator/PoseEstimator.pri)
-
+include(PathDrawer/PathDrawer.pri)
 
 include(PathProcessor/PathProcessor.pri)
 
