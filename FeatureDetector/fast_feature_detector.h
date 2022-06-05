@@ -10,6 +10,12 @@ class OpencvFastFeatureDetector : public IAbstractFeatureDetector
 {
 private:
   Ptr<FastFeatureDetector> m_detector;
+  int m_threshold;
+  bool m_nonmax_suppression;
+  uint8_t m_pattern_size;
+
+  void makeOffsets(int pixel[16], int row_stride);
+  int cornerScore(const uchar* ptr, const int pixel[], int threshold);
 
 public:
   OpencvFastFeatureDetector(Statistics *stat = nullptr, int threshold=10,
