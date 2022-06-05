@@ -13,7 +13,7 @@ class PathDrawer
 {
 private:
   static const int mc_width = 800, mc_height = 800;
-  static constexpr double scale = 0.1;
+  static constexpr double scale = 0.008;
 
   double m_x = 0, m_y = 0;
 

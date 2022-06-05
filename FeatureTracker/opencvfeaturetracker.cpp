@@ -51,8 +51,8 @@ bool OpencvFeatureTracker::track_features(Mat &frame_src, Mat &frame_dst, std::v
 
   cv::calcOpticalFlowPyrLK(frame_src, frame_dst, v_src_points, v_dst_points, status, error, m_winsize, 3, *m_termcriteria);  
 
-  m_stat->add_statistics(FEATURE_TRACKER, "Lucas-Kanade tracker current time: ", (double) (clock() - begin_time) / CLOCKS_PER_SEC);
-  m_stat->add_statistics(FEATURE_TRACKER, "Lucas-Kanade tracker average time: ", (double) (clock() - begin_time) / CLOCKS_PER_SEC, true);
+  m_stat->add_statistics(FEATURE_TRACKER, "Lucas-Kanade tracker current time: ", double(clock() - begin_time) / CLOCKS_PER_SEC);
+  m_stat->add_statistics(FEATURE_TRACKER, "Lucas-Kanade tracker average time: ", double(clock() - begin_time) / CLOCKS_PER_SEC, true);
 
   filter_values_out(v_src_points, v_dst_points, status);
 

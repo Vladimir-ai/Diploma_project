@@ -18,6 +18,8 @@ OpencvPoseEstimator::OpencvPoseEstimator(Statistics *statistics, double focal, P
 void OpencvPoseEstimator::find_matrix(const std::vector<Point2f> &base_points, const std::vector<Point2f> &current_points, Mat &R, Mat &t)
 {
   Mat essential_mat;
+  const clock_t begin_time = clock();
+
   R = Mat::eye(3, 3, CV_64F);
   t = Mat::zeros(3, 1, CV_64F);
 
@@ -28,5 +30,7 @@ void OpencvPoseEstimator::find_matrix(const std::vector<Point2f> &base_points, c
   catch (cv::Exception &error) {
   }
 
+  m_stat->add_statistics(POSE_ESTIMATOR, "Pose estimator last time: ", double(clock() - begin_time) / CLOCKS_PER_SEC);
+  m_stat->add_statistics(POSE_ESTIMATOR, "Pose estimator average time: ", double(clock() - begin_time) / CLOCKS_PER_SEC, true);
 }
 

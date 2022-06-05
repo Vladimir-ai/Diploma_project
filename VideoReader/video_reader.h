@@ -27,6 +27,10 @@ namespace SubmoduleVideoReader
 
     virtual uint64_t get_current_frame_num(void) = 0;
 
+    virtual Mat get_current_frame(void) = 0;
+    virtual Mat get_previous_frame(void) = 0;
+
+    virtual Mat read_frame_by_num(uint64_t num) = 0;
     virtual Mat read_next_frame(void) = 0;
 
     virtual bool is_finished(void) = 0;

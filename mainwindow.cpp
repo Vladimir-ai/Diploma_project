@@ -219,7 +219,7 @@ void MainWindow::handle_start_button()
   }
   m_drawer_widget->set_path_drawer(path_drawer);
 
-  // TODO: add pose estimator to path processor
+  m_statistics.clear_statistics();
 
   m_path_processor = new ModulePathProcessor::PathProcessor(feature_tracker,
                                                             feature_detector,

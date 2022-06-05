@@ -40,12 +40,12 @@ void ModulePathProcessor::PathProcessor::draw_trace(Mat &frame, const vector<Poi
   {
     for(size_t idx = 0; idx < curr_size; idx++)
     {
-      line(frame, dst_keypoints[idx], src_keypoints[idx], green, 2, LINE_AA);
+      line(frame, dst_keypoints[idx], src_keypoints[idx], green, 6, LINE_AA);
     }
   }
 
   for_each(src_keypoints.begin(), src_keypoints.end(),
-           [frame](const Point2f& keypoint){ circle(frame, keypoint, 3, Scalar(0, 0, 255), -1, FILLED | LINE_AA); });
+           [frame](const Point2f& keypoint){ circle(frame, keypoint, 7, Scalar(0, 0, 255), -1, FILLED | LINE_AA); });
 }
 
 
@@ -64,6 +64,7 @@ ModulePathProcessor::PathProcessor::~PathProcessor()
 Mat ModulePathProcessor::PathProcessor::get_curr_frame()
 {
   Mat img_copy;
+  const clock_t begin_time = clock();
 
   m_img_mutex.lock();
   if (m_img[m_current_switch].size != 0)
@@ -71,6 +72,11 @@ Mat ModulePathProcessor::PathProcessor::get_curr_frame()
     img_copy = m_img[m_current_switch].clone();
   }
   m_img_mutex.unlock();
+
+  if (m_stat)
+  {
+//    m_stat->add_statistics(POSE_ESTIMATOR, "Time to copy img:", double(clock() - begin_time) / CLOCKS_PER_SEC, true);
+  }
 
   return img_copy;
 }
@@ -213,6 +219,10 @@ void ModulePathProcessor::PathProcessor::process_frame(uint8_t job_count)
   if (!m_video_reader->is_finished())
   {
     auto frame = m_video_reader->read_next_frame();
+    Mat grayscale;
+    cvtColor(frame, grayscale, COLOR_BGR2GRAY);
+    cvtColor(grayscale, frame, COLOR_GRAY2BGR);
+
     vector<Point2f> src_keypoints_copy;
     vector<Point2f> dst_keypoints_copy;
 

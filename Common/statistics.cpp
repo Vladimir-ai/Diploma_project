@@ -51,6 +51,11 @@ void Statistics::clear_statistics(stat_type type, string name)
 
   if (type == STAT_TYPE_SIZE)
   {
+    if (!name.length())
+    {
+      m_general_stat.values.clear();
+    }
+
     for (auto val : m_stat)
     {
       if (name.length())
