@@ -15,13 +15,14 @@
 #include "VideoReader/open_cv_video_reader.h"
 #include "Logger/boostlogger.h"
 #include "VideoReader/opencv_video_reader_widget.h"
+#include "loader.h"
 
 //make factories
 //factory video driver
 //factory feature detector
 //factory feature tracker.
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, const std::string lib_path)
     : QMainWindow(parent)
 {
   setWindowTitle("Visual Odometry");
@@ -36,6 +37,11 @@ MainWindow::MainWindow(QWidget *parent)
   m_drawer_widget->set_stat(&m_statistics);
 
   m_central_widget->setFixedSize(1341, 682);
+
+  if (lib_path.size())
+  {
+    m_lib_path = lib_path;
+  }
 }
 
 
@@ -59,9 +65,21 @@ inline void MainWindow::init_video_reader_layout()
   m_video_reader_layout = new QVBoxLayout();
   QLabel *video_reader_label = new QLabel("Video Reader type:");
   m_video_reader_box = new QComboBox();
+  std::vector<AbstractInfoQtFrame *> libs;
 
   m_reader_info = new OpenCvVideoReaderInfoWidget(&m_statistics, m_logger, error_handler);
   m_video_reader_box->addItem(QString::fromStdString(m_reader_info->get_name()), QVariant::fromValue(m_reader_info));
+
+  if (m_lib_path.size())
+  {
+    libs = read_all_files(m_lib_path, g_video_reader_symbol);
+
+    for (auto lib : libs)
+    {
+      m_video_reader_box->addItem(QString::fromStdString(lib->get_name()), QVariant::fromValue(lib));
+    }
+  }
+
   m_video_reader_layout->addWidget(video_reader_label);
   m_video_reader_layout->addWidget(m_video_reader_box);
   m_video_reader_layout->addWidget(m_reader_info);
@@ -78,6 +96,17 @@ inline void MainWindow::init_feature_detector_layout()
   m_detector_info = new FastFeatureDetectorOptions(&m_statistics, m_logger, error_handler);
 
   m_feature_detector_box->addItem(QString::fromStdString(m_detector_info->get_name()), QVariant::fromValue(m_detector_info));
+
+  if (m_lib_path.size())
+  {
+    libs = read_all_files(m_lib_path, g_feature_detector_symbol);
+
+    for (auto lib : libs)
+    {
+      m_feature_detector_box->addItem(QString::fromStdString(lib->get_name()), QVariant::fromValue(lib));
+    }
+  }
+
   m_feature_detector_layout->addWidget(feature_detector_label);
   m_feature_detector_layout->addWidget(m_feature_detector_box);
   m_feature_detector_layout->addWidget(m_detector_info);
@@ -94,6 +123,17 @@ void MainWindow::init_feature_tracker_layout()
   m_tracker_info = new OpencvFeatureTrackerWidget(&m_statistics, m_logger, error_handler);
 
   m_feature_tracker_box->addItem(QString::fromStdString(m_tracker_info->get_name()), QVariant::fromValue(m_tracker_info));
+
+  if (m_lib_path.size())
+  {
+    libs = read_all_files(m_lib_path, g_feature_tracker_symbol);
+
+    for (auto lib : libs)
+    {
+      m_feature_tracker_box->addItem(QString::fromStdString(lib->get_name()), QVariant::fromValue(lib));
+    }
+  }
+
   m_feature_tracker_layout->addWidget(feature_tracker_label);
   m_feature_tracker_layout->addWidget(m_feature_tracker_box);
   m_feature_tracker_layout->setSpacing(5);
@@ -109,6 +149,16 @@ void MainWindow::init_pose_estimator_layout()
   m_pose_estimator_info = new OpencvPoseEstimatorWidget(&m_statistics, m_logger, error_handler);
 
   m_pose_estimator_box->addItem(QString::fromStdString(m_pose_estimator_info->get_name()), QVariant::fromValue(m_pose_estimator_info));
+
+  if (m_lib_path.size())
+  {
+    libs = read_all_files(m_lib_path, g_pose_estimator_symbol);
+
+    for (auto lib : libs)
+    {
+      m_pose_estimator_box->addItem(QString::fromStdString(lib->get_name()), QVariant::fromValue(lib));
+    }
+  }
 
   m_pose_estimator_layout->addWidget(pose_estimator_label);
   m_pose_estimator_layout->addWidget(m_pose_estimator_box);

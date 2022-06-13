@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow(QWidget *parent = nullptr);
+  MainWindow(QWidget *parent = nullptr, const std::string lib_path = "");
   ~MainWindow();
 
   static void error_handler(std::string error);
@@ -67,6 +67,7 @@ private:
 
   PathDrawerQWidget *m_drawer_widget;
   Statistics m_statistics; // Send it to every object! Also allow path_processor to access its fields!
+  std::string m_lib_path = "";
 
   inline void init_video_reader_layout(void);
   inline void init_feature_detector_layout(void);

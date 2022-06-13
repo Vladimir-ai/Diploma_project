@@ -34,5 +34,6 @@ public:
   virtual std::string get_name(void) = 0;
 };
 
+typedef AbstractInfoQtFrame* (*Loader)(void);
 
 #endif // QT_GUI_PROPERTIES_H
