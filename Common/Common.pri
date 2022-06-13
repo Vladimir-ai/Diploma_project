@@ -8,6 +8,6 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/statistics.cpp \
-    $$PWd/loader.cpp
+    $$PWD/loader.cpp
 
 
