@@ -2,12 +2,14 @@
 #define OPENCV_POSE_ESTIMATOR_WIDGET_H
 
 #include <Common/qt_gui_properties.h>
+#include "opencv_pose_estimator.h"
 
 #include <QVBoxLayout>
 #include <QPushButton>
 
 class OpencvPoseEstimatorWidget : public AbstractInfoQtFrame
 {
+friend class SubmodulePoseEstimator::OpencvPoseEstimator;
 private:
   QVBoxLayout *m_layout;
   QPushButton *m_camera_matrix_push_button;
@@ -17,6 +19,9 @@ private:
   int m_method;
   double m_prob;
   double m_threshold;
+
+  Mat m_cam_matrix;
+  Mat m_dist_coefs;
 
   static inline std::vector<cv::Point3f> init_world_coordinates(const int rows, const int cols);
 

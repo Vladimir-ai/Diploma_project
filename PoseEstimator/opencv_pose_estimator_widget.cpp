@@ -1,4 +1,3 @@
-#include "opencv_pose_estimator.h"
 #include "opencv_pose_estimator_widget.h"
 
 #include <QFileDialog>
@@ -22,6 +21,12 @@ inline std::vector<Point3f> OpencvPoseEstimatorWidget::init_world_coordinates(co
 
 OpencvPoseEstimatorWidget::OpencvPoseEstimatorWidget(Statistics *stat, AbstractLogger *logger, FuncErrorHandler err_handler): AbstractInfoQtFrame(stat, logger, err_handler)
 {
+//  float cam_mat[9] = { 7.0709e+02, 0, 6.018873000000e+02, 0, 7.070912000000e+02, 1.831104000000e+02, 0, 0, 1 };
+//  float dist_coefs[5] = { -3.644661e-01, 1.790019e-01, 1.148107e-03, -6.298563e-04, -5.314062e-02 };
+//  float dist_coefs[5] = { 1, 1, 1, 1, 1 };
+  float cam_mat[9] = { 9.591977e+02, 0, 9.529324e+02, 0, 6.944383e+02, 2.416793e+02, 0, 0, 1 };
+  float dist_coefs[5] = { -3.725637e-01, 1.979803e-01, 1.799970e-04, 1.250593e-03, -6.608481e-02 };
+
   m_layout = new QVBoxLayout(this);
   m_camera_matrix_push_button = new QPushButton("Cam calibration data");
 
@@ -38,6 +43,9 @@ OpencvPoseEstimatorWidget::OpencvPoseEstimatorWidget(Statistics *stat, AbstractL
 
   this->setFrameShape(Shape::Box);
   this->setLineWidth(1);
+
+  m_cam_matrix = Mat(3, 3, CV_32F, cam_mat).clone();
+  m_dist_coefs = Mat(1, 5, CV_32F, dist_coefs).clone();
 }
 
 
@@ -61,7 +69,11 @@ SubmoduleVideoReader::IAbstractVideoReader *OpencvPoseEstimatorWidget::get_video
 
 SubmodulePoseEstimator::IAbstractPoseEstimator *OpencvPoseEstimatorWidget::get_pose_estimator()
 {
-  return new SubmodulePoseEstimator::OpencvPoseEstimator(m_stat);
+  SubmodulePoseEstimator::OpencvPoseEstimator *estimator = new SubmodulePoseEstimator::OpencvPoseEstimator(m_stat);
+  estimator->m_cam_matrix = m_cam_matrix.clone();
+  estimator->m_distortion_coef = m_dist_coefs.clone();
+  estimator->m_cam_mat_inv = m_cam_matrix.clone().inv();
+  return estimator;
 }
 
 
@@ -137,6 +149,9 @@ void OpencvPoseEstimatorWidget::call_camera_calib_data()
     log_string = "Camera matrix: ";
     log_string << cam_mat;
     LOG_INFO(m_logger, log_string);
+
+    m_cam_matrix = cam_mat;
+    m_dist_coefs = dist_coefs;
   }
 }
 
