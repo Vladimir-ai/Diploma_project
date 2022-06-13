@@ -15,7 +15,7 @@
 #include "VideoReader/open_cv_video_reader.h"
 #include "Logger/boostlogger.h"
 #include "VideoReader/opencv_video_reader_widget.h"
-#include "loader.h"
+#include "Common/loader.h"
 
 //make factories
 //factory video driver
@@ -92,6 +92,7 @@ inline void MainWindow::init_feature_detector_layout()
   m_feature_detector_layout = new QVBoxLayout();
   QLabel *feature_detector_label = new QLabel("Feature Detector type:");
   m_feature_detector_box = new QComboBox();
+  std::vector<AbstractInfoQtFrame *> libs;
 
   m_detector_info = new FastFeatureDetectorOptions(&m_statistics, m_logger, error_handler);
 
@@ -119,6 +120,7 @@ void MainWindow::init_feature_tracker_layout()
   m_feature_tracker_layout = new QVBoxLayout();
   QLabel *feature_tracker_label = new QLabel("Feature Tracker type:");
   m_feature_tracker_box = new QComboBox();
+  std::vector<AbstractInfoQtFrame *> libs;
 
   m_tracker_info = new OpencvFeatureTrackerWidget(&m_statistics, m_logger, error_handler);
 
@@ -145,6 +147,7 @@ void MainWindow::init_pose_estimator_layout()
   m_pose_estimator_layout = new QVBoxLayout();
   QLabel *pose_estimator_label = new QLabel("Pose estimator type:");
   m_pose_estimator_box = new QComboBox();
+  std::vector<AbstractInfoQtFrame *> libs;
 
   m_pose_estimator_info = new OpencvPoseEstimatorWidget(&m_statistics, m_logger, error_handler);
 

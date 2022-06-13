@@ -95,3 +95,10 @@ std::vector<AbstractInfoQtFrame *> read_all_files(const std::string path, const 
 
   return result;
 }
+
+
+std::vector<AbstractInfoQtFrame *> read_all_files(const std::string path, const std::string &symbol)
+{
+  std::vector<std::string> symbols = {symbol};
+  return read_all_files(path, symbols);
+}
