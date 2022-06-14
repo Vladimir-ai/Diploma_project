@@ -64,7 +64,6 @@ ModulePathProcessor::PathProcessor::~PathProcessor()
 Mat ModulePathProcessor::PathProcessor::get_curr_frame()
 {
   Mat img_copy;
-  const clock_t begin_time = clock();
 
   m_img_mutex.lock();
   if (m_img[m_current_switch].size != 0)

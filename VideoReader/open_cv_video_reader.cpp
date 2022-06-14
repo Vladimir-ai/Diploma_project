@@ -4,7 +4,6 @@
 #include "Common/common.h"
 
 
-// TODO: add checks to path in the outer part
 OpencvVideoReader::OpencvVideoReader(std::string path_to_video)
 {
   m_cap = new VideoCapture(path_to_video);

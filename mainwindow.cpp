@@ -16,6 +16,8 @@
 #include "Logger/boostlogger.h"
 #include "VideoReader/opencv_video_reader_widget.h"
 #include "Common/loader.h"
+#include "FeatureDetector/orbfeaturedetectoroptions.h"
+#include <FeatureDetector/shitomasifeaturedetectoroptions.h>
 
 //make factories
 //factory video driver
@@ -93,10 +95,14 @@ inline void MainWindow::init_feature_detector_layout()
   QLabel *feature_detector_label = new QLabel("Feature Detector type:");
   m_feature_detector_box = new QComboBox();
   std::vector<AbstractInfoQtFrame *> libs;
+  OrbFeatureDetectorOptions *orb_opts = new OrbFeatureDetectorOptions(&m_statistics, m_logger, error_handler);
+  AbstractInfoQtFrame *shi_tomasi = new ShiTomasiFeatureDetectorOptions(&m_statistics, m_logger, error_handler);
 
   m_detector_info = new FastFeatureDetectorOptions(&m_statistics, m_logger, error_handler);
 
   m_feature_detector_box->addItem(QString::fromStdString(m_detector_info->get_name()), QVariant::fromValue(m_detector_info));
+  m_feature_detector_box->addItem(QString::fromStdString(orb_opts->get_name()), QVariant::fromValue(orb_opts));
+  m_feature_detector_box->addItem(QString::fromStdString(shi_tomasi ->get_name()), QVariant::fromValue(shi_tomasi ));
 
   if (m_lib_path.size())
   {
@@ -366,8 +372,13 @@ void MainWindow::handle_detector_type_change(int new_value)
 {
   if (new_value != -1)
   {
-    m_feature_detector_layout->replaceWidget(m_detector_info, static_cast<AbstractInfoQtFrame *>(m_feature_detector_box->itemData(new_value).data()));
-    m_detector_info = static_cast<AbstractInfoQtFrame *>(m_feature_detector_box->itemData(new_value).data());
+    auto res = m_feature_detector_box->itemData(new_value).value<AbstractInfoQtFrame *>();
+    m_feature_detector_layout->replaceWidget(m_detector_info, res);
+
+    m_detector_info->hide();
+    res->show();
+
+    m_detector_info = res;
   }
 }
 
@@ -376,8 +387,13 @@ void MainWindow::handle_tracker_type_change(int new_value)
 {
   if (new_value != -1)
   {
-    m_feature_detector_layout->replaceWidget(m_tracker_info, static_cast<AbstractInfoQtFrame *>(m_feature_tracker_box->itemData(new_value).data()));
-    m_tracker_info = static_cast<AbstractInfoQtFrame *>(m_feature_tracker_box->itemData(new_value).data());
+    auto res = m_feature_tracker_box->itemData(new_value).value<AbstractInfoQtFrame *>();
+    m_feature_tracker_layout->replaceWidget(m_tracker_info, res);
+
+    m_tracker_info->hide();
+    res->show();
+
+    m_tracker_info = res;
   }
 }
 
@@ -386,8 +402,13 @@ void MainWindow::handle_pose_estimator_type_change(int new_value)
 {
   if (new_value != -1)
   {
-    m_pose_estimator_layout->replaceWidget(m_pose_estimator_info, static_cast<AbstractInfoQtFrame *>(m_pose_estimator_box->itemData(new_value).data()));
-    m_pose_estimator_info = static_cast<AbstractInfoQtFrame *>(m_pose_estimator_box->itemData(new_value).data());
+    auto res = m_pose_estimator_box->itemData(new_value).value<AbstractInfoQtFrame *>();
+    m_pose_estimator_layout->replaceWidget(m_pose_estimator_info, res);
+
+    m_pose_estimator_info->hide();
+    res->show();
+
+    m_pose_estimator_info = res;
   }
 }
 

@@ -14,8 +14,13 @@ private:
   QPushButton *m_path_button;
 //  std::string m_path = "/home/krevedko/Desktop/14/image_0/res.mp4";
 //  std::string m_path = "/home/krevedko/PyCharmProjects/pyslam/videos/kitti00/video.mp4";
+  std::string m_path = "/home/krevedko/Desktop/05/image_0/output.mp4";
+//   std::string m_path = "/home/krevedko/Desktop/image_0/output.mp4";
+//  std::string m_path = "/shindows/Users/KrevedKO/Desktop/DCIMA/MOVA6452.avi";
+//  std::string m_path = "/home/krevedko/Downloads/MOVA6452 (online-video-cutter.com).mp4";
+
 //  std::string m_path = "/home/krevedko/Desktop/Курсач/Cam/Cropped/VID_20210405_081118.mp4";
-  std::string m_path = "/home/krevedko/Desktop/Курсач/Cam/Cropped/VID_20210405_072743.mp4";
+//  std::string m_path = "/home/krevedko/Desktop/Курсач/Cam/Cropped/VID_20210405_072743.mp4";
 
   void call_video_selection(void);
 

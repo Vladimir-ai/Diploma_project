@@ -31,8 +31,11 @@ void PathDrawer::update_pos(Mat R, Mat t)
   curr_t += scale * (curr_R * t);
   curr_R = R * curr_R;
 
-  m_x += curr_t.at<double>(2);
-  m_y += curr_t.at<double>(0);
+//  if (curr_t.at<double>(0) >= 0.1 && curr_t.at<double>(1) >= 0.1)
+//  {
+    m_x += curr_t.at<double>(0);
+    m_y += curr_t.at<double>(1);
+//  }
 
   m_mutex.lock();
 
@@ -41,7 +44,7 @@ void PathDrawer::update_pos(Mat R, Mat t)
 
   text_str << "x = " << m_x << ", y = " << m_y;
 
-  putText(m_trajectory, text_str.str(), cv::Point(20, 20), FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar::all(255), 1, LINE_AA);
+  putText(m_trajectory, text_str.str(), cv::Point(20, 30), FONT_HERSHEY_COMPLEX, 1, cv::Scalar::all(255), 1, LINE_AA);
 
   m_mutex.unlock();
 }
